@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 86" role="img" aria-labelledby="title desc">
+  <title id="title">MOOR SPICE</title>
+  <desc id="desc">MOOR SPICE ロゴ</desc>
+  <g transform="translate(151 5)">
+    <circle cx="35" cy="35" r="31" fill="#4b512b"/>
+    <path d="M38.7 13.2C28.4 19.4 22.4 28.7 22.4 39.5c0 7.4 4.2 12.8 11.2 16-3.2-5.6-3.6-11.2-1.1-16.9 2.5-5.7 7.1-9.7 13.8-11.9-1.7-5.4-4.2-9.9-7.6-13.5Z" fill="#f7f3ea"/>
+    <path d="M37.7 51.3c4.8-7.6 6.4-15.9 4.8-24.8" fill="none" stroke="#b18a45" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <text x="8" y="48" fill="#8f201c" font-family="Georgia,serif" font-size="32" letter-spacing="8">MOOR</text>
+  <text x="232" y="48" fill="#8f201c" font-family="Georgia,serif" font-size="32" letter-spacing="7">SPICE</text>
+  <text x="157" y="82" fill="#625c52" font-family="Arial,sans-serif" font-size="9" letter-spacing="5">EST. 2014</text>
+</svg>

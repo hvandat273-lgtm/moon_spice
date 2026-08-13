@@ -1,0 +1,802 @@
+/* ---------------------------------------------------------------------------
+ * The standalone pages: about, recipes, recipe detail, FAQ, contact, the legal
+ * prose pages, and the error / empty / loading states.
+ *
+ * They share the chapter language of the home page — full-bleed imagery, a
+ * gold label over a serif heading, hairline rules — rather than the old
+ * `.pageHero` band with its 3px olive rule and centred vermilion underline.
+ * ------------------------------------------------------------------------ */
+
+.page {
+  min-height: 60vh;
+}
+
+/* --- Shared page opening -------------------------------------------------- */
+
+/* A full-bleed photograph with the heading sitting on it, in place of the old
+ * centred banner. `--page-hero-image` is set per page in the markup. */
+.pageHero {
+  position: relative;
+  min-height: clamp(24rem, 62svh, 38rem);
+  display: flex;
+  align-items: flex-end;
+  overflow: clip;
+  isolation: isolate;
+  padding-block: clamp(7.5rem, 14vh, 10rem) clamp(2.5rem, 6vh, 4rem);
+}
+
+.pageHeroImage {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+}
+
+.pageHeroImage img {
+  object-fit: cover;
+}
+
+.pageHeroVeil {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  /* Heading sits bottom-left, so the scrim is heaviest there and the top-right
+     of the photograph is left almost untouched. */
+  background:
+    linear-gradient(0deg, var(--night) 0%, color-mix(in srgb, var(--bg) 76%, transparent) 34%, color-mix(in srgb, var(--bg) 22%, transparent) 66%, color-mix(in srgb, var(--bg) 14%, transparent) 100%),
+    linear-gradient(90deg, color-mix(in srgb, var(--bg) 70%, transparent), color-mix(in srgb, var(--bg) 18%, transparent) 52%, transparent 78%);
+}
+
+.pageHeroCopy {
+  width: min(calc(100% - clamp(1.5rem, 5vw, 4rem)), var(--container));
+  max-width: 52rem;
+  margin-inline: auto;
+}
+
+.pageLabel {
+  margin: 0 0 0.9rem;
+  color: var(--gold);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.pageHeroCopy h1 {
+  margin: 0;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: var(--step-4);
+  font-weight: 600;
+  line-break: strict;
+  line-height: 1.16;
+  text-wrap: balance;
+}
+
+.pageLead {
+  max-width: 48ch;
+  margin: 1rem 0 0;
+  color: var(--on-night-muted);
+  font-size: 0.95rem;
+  line-height: 1.85;
+}
+
+.pageBody {
+  width: min(calc(100% - clamp(1.5rem, 5vw, 4rem)), var(--container));
+  margin: clamp(3rem, 7vw, 5.5rem) auto clamp(4rem, 9vw, 7rem);
+}
+
+/* --- About ---------------------------------------------------------------- */
+
+.statement {
+  max-width: 30ch;
+  margin: 0;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: var(--step-4);
+  font-weight: 600;
+  line-break: strict;
+  line-height: 1.24;
+}
+
+.statementBody {
+  max-width: 58ch;
+  margin: 1.5rem 0 0;
+  color: var(--on-night-muted);
+  font-size: 0.94rem;
+  line-height: 2;
+}
+
+.valueRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1rem, 3vw, 2.5rem);
+  margin: clamp(2.5rem, 6vw, 4.5rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.valueRow li {
+  border-top: 1px solid var(--hairline-night);
+  padding-top: 1.1rem;
+  transition: border-top-color var(--dur-base) var(--ease-out-expo);
+}
+
+.valueRow li:hover {
+  border-top-color: var(--gold);
+}
+
+.valueRow svg {
+  color: var(--gold);
+}
+
+.valueRow h2 {
+  margin: 0.7rem 0 0;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: var(--step-1);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.valueRow p {
+  margin: 0.5rem 0 0;
+  color: var(--on-night-muted);
+  font-size: 0.82rem;
+  line-height: 1.85;
+}
+
+/* Second full-bleed scene, closing the page. */
+.kitchen {
+  position: relative;
+  min-height: clamp(26rem, 66svh, 40rem);
+  display: flex;
+  align-items: center;
+  overflow: clip;
+  isolation: isolate;
+}
+
+.kitchenImage {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  overflow: hidden;
+}
+
+.kitchenImage img {
+  object-fit: cover;
+}
+
+.kitchenVeil {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(90deg, var(--night) 0%, color-mix(in srgb, var(--bg) 88%, transparent) 42%, color-mix(in srgb, var(--bg) 28%, transparent) 74%, transparent);
+}
+
+.kitchenCopy {
+  width: min(calc(100% - clamp(1.5rem, 5vw, 4rem)), var(--container));
+  max-width: 34rem;
+  margin-inline: auto;
+}
+
+.kitchenCopy h2 {
+  margin: 0.7rem 0 0;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: var(--step-3);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.kitchenCopy p {
+  max-width: 46ch;
+  margin: 1rem 0 1.5rem;
+  color: var(--on-night-muted);
+  font-size: 0.9rem;
+  line-height: 1.9;
+}
+
+/* --- Recipes -------------------------------------------------------------- */
+
+.recipeList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 30rem), 1fr));
+  gap: clamp(1.2rem, 3vw, 2.2rem);
+}
+
+.recipeCard {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  overflow: hidden;
+  border: 1px solid var(--hairline-night);
+  border-radius: var(--card-radius);
+  background: var(--night-soft);
+  box-shadow: var(--depth-mid);
+  transition:
+    transform var(--dur-slow) var(--ease-out-expo),
+    border-color var(--dur-slow) var(--ease-out-expo);
+}
+
+.recipeCard:hover {
+  transform: translateY(-5px);
+  border-color: color-mix(in srgb, var(--accent-2) 40%, transparent);
+}
+
+.recipeCardImage {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 16 / 11;
+}
+
+.recipeCardImage img {
+  object-fit: cover;
+  transform: scale(1.001);
+  transition: transform 650ms var(--ease-out-expo);
+}
+
+.recipeCard:hover .recipeCardImage img,
+.recipeCard:focus-within .recipeCardImage img {
+  transform: scale(1.055);
+}
+
+.recipeCardBody {
+  align-self: center;
+  padding: clamp(1.4rem, 3vw, 2.2rem);
+}
+
+.recipeMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  color: var(--gold);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.recipeMeta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.recipeCard h2 {
+  margin: 0.7rem 0 0;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: var(--step-2);
+  font-weight: 600;
+  line-break: strict;
+  line-height: 1.4;
+}
+
+.recipeCardBody > p {
+  max-width: 60ch;
+  margin: 0.75rem 0 1.2rem;
+  color: var(--on-night-muted);
+  font-size: 0.85rem;
+  line-height: 1.8;
+}
+
+/* --- Recipe detail -------------------------------------------------------- */
+
+.breadcrumbs {
+  width: min(calc(100% - clamp(1.5rem, 5vw, 4rem)), var(--container));
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-inline: auto;
+  color: var(--on-night-muted);
+  font-size: 0.7rem;
+}
+
+.breadcrumbs a:hover {
+  color: var(--gold);
+}
+
+.breadcrumbs [aria-current] {
+  overflow: hidden;
+  color: var(--on-night);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recipeBody {
+  width: min(calc(100% - clamp(1.5rem, 5vw, 4rem)), 62rem);
+  display: grid;
+  grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+  gap: clamp(2rem, 6vw, 5rem);
+  margin: clamp(3rem, 6vw, 5rem) auto 0;
+}
+
+/* Ingredients stay on screen for the whole method. */
+.recipeAside {
+  position: sticky;
+  top: 7.5rem;
+  align-self: start;
+  border: 1px solid var(--hairline-night);
+  border-top: 2px solid var(--gold);
+  border-radius: var(--card-radius);
+  background: var(--night-soft);
+  padding: clamp(1.3rem, 3vw, 2rem);
+}
+
+.recipeBody h2 {
+  margin: 0;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: var(--step-2);
+  font-weight: 600;
+}
+
+.recipeBody ul {
+  margin: 1rem 0 1.4rem;
+  padding: 0;
+  list-style: none;
+}
+
+.recipeBody ul li {
+  border-bottom: 1px solid var(--hairline-night);
+  padding-block: 0.6rem;
+  color: var(--on-night-muted);
+  font-size: 0.84rem;
+}
+
+.recipeAside a {
+  color: var(--gold);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-transform: uppercase;
+}
+
+.recipeSteps ol {
+  display: grid;
+  gap: 0.7rem;
+  margin: 1.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recipeSteps li {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr;
+  gap: 1rem;
+  align-items: start;
+  border: 1px solid var(--hairline-night);
+  border-radius: 14px;
+  background: var(--night-soft);
+  padding: clamp(0.9rem, 2vw, 1.3rem);
+}
+
+.recipeSteps li > span {
+  color: var(--vermilion);
+  font-family: var(--font-display), ui-serif, serif;
+  font-size: 1.6rem;
+  font-style: italic;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.recipeSteps li p {
+  margin: 0;
+  color: var(--on-night);
+  line-height: 1.85;
+}
+
+.backLink {
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 3.5rem auto clamp(4rem, 9vw, 7rem);
+  color: var(--gold);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+/* --- FAQ ------------------------------------------------------------------ */
+
+.faqLayout {
+  width: min(calc(100% - clamp(1.5rem, 5vw, 4rem)), 62rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 17rem;
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: start;
+  margin: clamp(3rem, 6vw, 5rem) auto clamp(4rem, 9vw, 7rem);
+}
+
+.faqGroup {
+  margin-bottom: 2.5rem;
+}
+
+.faqGroup > h2 {
+  margin: 0 0 0.9rem;
+  border-top: 1px solid var(--gold);
+  padding-top: 0.9rem;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: var(--step-1);
+  font-weight: 600;
+}
+
+.faqGroup details {
+  border-top: 1px solid var(--hairline-night);
+  interpolate-size: allow-keywords;
+}
+
+.faqGroup details:last-child {
+  border-bottom: 1px solid var(--hairline-night);
+}
+
+/* `interpolate-size: allow-keywords` (set on :root in motion.css) plus
+ * allow-discrete lets the native disclosure animate its real height with no JS
+ * and no hard-coded max-height. */
+.faqGroup details::details-content {
+  overflow: clip;
+  block-size: 0;
+  transition:
+    block-size var(--dur-slow) var(--ease-out-expo),
+    content-visibility var(--dur-slow) allow-discrete;
+  transition-behavior: allow-discrete;
+}
+
+.faqGroup details[open]::details-content {
+  block-size: auto;
+}
+
+.faqGroup summary {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: pointer;
+  color: var(--on-night);
+  font-size: 0.88rem;
+  font-weight: 600;
+  list-style: none;
+  transition: color var(--dur-fast) var(--ease-out-expo);
+}
+
+.faqGroup summary::-webkit-details-marker {
+  display: none;
+}
+
+.faqGroup summary:hover {
+  color: var(--gold);
+}
+
+.faqGroup summary svg {
+  min-width: 19px;
+  color: var(--vermilion);
+  transition: transform var(--dur-base) var(--ease-out-expo);
+}
+
+.faqGroup details[open] summary svg {
+  transform: rotate(180deg);
+}
+
+.faqGroup details p {
+  margin: -0.15rem 0 1.2rem;
+  color: var(--on-night-muted);
+  font-size: 0.84rem;
+  line-height: 1.85;
+}
+
+.aside {
+  position: sticky;
+  top: 7.5rem;
+  border: 1px solid var(--hairline-night);
+  border-left: 2px solid var(--gold);
+  border-radius: var(--card-radius);
+  background: var(--night-soft);
+  padding: 1.85rem;
+}
+
+.aside svg {
+  color: var(--gold);
+}
+
+.aside h2 {
+  margin: 0.8rem 0 0;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: var(--step-1);
+  font-weight: 600;
+}
+
+.aside p {
+  color: var(--on-night-muted);
+  font-size: 0.82rem;
+  line-height: 1.9;
+}
+
+.aside a {
+  display: inline-flex;
+  margin-top: 0.5rem;
+  border-bottom: 1px solid var(--gold);
+  color: var(--gold);
+  padding-bottom: 0.2rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+/* --- Contact -------------------------------------------------------------- */
+
+.contactGrid {
+  width: min(calc(100% - clamp(1.5rem, 5vw, 4rem)), 62rem);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: var(--bento-gap);
+  margin: clamp(3rem, 6vw, 5rem) auto clamp(4rem, 9vw, 7rem);
+  perspective: 1200px;
+}
+
+.contactGrid article {
+  min-height: 16rem;
+  border: 1px solid var(--hairline-night);
+  border-top: 2px solid var(--gold);
+  border-radius: var(--card-radius);
+  background: var(--night-soft);
+  padding: clamp(1.4rem, 3vw, 2rem);
+  box-shadow: var(--depth-near);
+  transition:
+    transform var(--dur-slow) var(--ease-out-expo),
+    box-shadow var(--dur-slow) var(--ease-out-expo),
+    border-top-color var(--dur-slow) var(--ease-out-expo);
+}
+
+.contactGrid article:hover {
+  transform: perspective(900px) rotateX(3deg) translateY(-4px);
+  border-top-color: var(--vermilion);
+  box-shadow: var(--depth-mid);
+}
+
+.contactGrid svg {
+  color: var(--gold);
+}
+
+.contactGrid h2 {
+  margin: 0.9rem 0 0;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: var(--step-2);
+  font-weight: 600;
+}
+
+.contactGrid p {
+  color: var(--on-night-muted);
+  font-size: 0.84rem;
+  line-height: 1.85;
+}
+
+.contactGrid a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--gold);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* --- Legal prose ---------------------------------------------------------- */
+
+.prose {
+  width: min(calc(100% - clamp(1.5rem, 5vw, 4rem)), 54rem);
+  margin: clamp(3rem, 6vw, 5rem) auto clamp(4rem, 9vw, 7rem);
+}
+
+/* Shown on the English locale only: these two pages are published in Japanese
+ * because a machine translation of a legal document is not a legal document. */
+.legalNotice {
+  margin: 0 0 clamp(2rem, 4vw, 3rem);
+  border: 1px solid color-mix(in srgb, var(--accent-2) 34%, transparent);
+  border-radius: var(--card-radius);
+  background: var(--night-soft);
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+  color: var(--on-night-muted);
+  font-size: 0.84rem;
+  line-height: 1.8;
+}
+
+.proseSection {
+  display: grid;
+  grid-template-columns: 0.62fr 1.38fr;
+  gap: clamp(1.5rem, 5vw, 4rem);
+  border-bottom: 1px solid var(--hairline-night);
+  padding-block: 2rem;
+}
+
+.proseSection:first-of-type {
+  padding-top: 0;
+}
+
+/* Headings ride alongside their own text rather than scrolling away from it. */
+.proseSection h2 {
+  position: sticky;
+  top: 7.5rem;
+  align-self: start;
+  margin: 0;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: var(--step-1);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.proseSection p,
+.proseSection li {
+  max-width: 68ch;
+  color: var(--on-night-muted);
+  font-size: 0.92rem;
+  line-height: 1.95;
+}
+
+.proseSection p:first-child {
+  margin-top: 0;
+}
+
+.proseSection p:last-child {
+  margin-bottom: 0;
+}
+
+/* --- Empty, error and loading states -------------------------------------- */
+
+.noResults {
+  display: grid;
+  min-height: 20rem;
+  place-items: center;
+  align-content: center;
+  border: 1px dashed var(--line);
+  border-radius: var(--card-radius);
+  padding: 2rem;
+  text-align: center;
+}
+
+.noResults h2 {
+  margin: 0;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: var(--step-2);
+  font-weight: 600;
+}
+
+.noResults p {
+  margin: 0.5rem 0 1.3rem;
+  color: var(--on-night-muted);
+}
+
+.errorState {
+  width: min(calc(100% - 2rem), 48rem);
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-inline: auto;
+  padding: 4rem 0;
+  text-align: center;
+}
+
+/* Outlined, not filled: the numeral is scenery, not a headline. */
+.errorState > span {
+  display: block;
+  color: transparent;
+  font-family: var(--font-display), Georgia, ui-serif, serif;
+  font-size: clamp(6rem, 18vw, 12rem);
+  line-height: 0.8;
+  -webkit-text-stroke: 2px color-mix(in srgb, var(--accent-2) 34%, transparent);
+}
+
+.errorState > p {
+  margin: 1.8rem 0 0;
+  color: var(--gold);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+}
+
+.errorState h1 {
+  max-width: 18ch;
+  margin: 0.5rem 0 1.8rem;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: var(--step-4);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.errorState > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+.loadingState {
+  width: min(calc(100% - 2rem), var(--container));
+  margin: 6rem auto 0;
+}
+
+.loadingHero,
+.loadingCard {
+  background: linear-gradient(100deg, var(--bg-soft) 20%, var(--bg-raised) 42%, var(--bg-soft) 64%);
+  background-size: 200% 100%;
+  animation: loadingShimmer 1.4s ease-in-out infinite;
+}
+
+.loadingHero {
+  height: clamp(20rem, 45vw, 34rem);
+  border-radius: var(--card-radius);
+}
+
+.loadingGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.loadingCard {
+  aspect-ratio: 0.8;
+  border-radius: 16px;
+}
+
+@keyframes loadingShimmer {
+  to {
+    background-position-x: -200%;
+  }
+}
+
+/* --- Responsive ----------------------------------------------------------- */
+
+@media (max-width: 69.99rem) {
+  .faqLayout,
+  .recipeBody {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Stacked, a pinned aside would push the content it belongs to off screen. */
+  .aside,
+  .recipeAside {
+    position: static;
+  }
+}
+
+@media (max-width: 47.99rem) {
+  .valueRow,
+  .recipeCard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .proseSection {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  /* Stacked, a pinned heading would simply cover its own paragraph. */
+  .proseSection h2 {
+    position: static;
+  }
+
+  .loadingGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loadingHero,
+  .loadingCard {
+    animation: none;
+  }
+}

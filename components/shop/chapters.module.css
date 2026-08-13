@@ -1,0 +1,1248 @@
+/* ---------------------------------------------------------------------------
+ * The six chapters, plus the fixed rail and the closing call to action.
+ *
+ * Each chapter is a full-viewport scene with its own composition. Shared
+ * layout primitives (`.chapter`, `.chapter-inner`, `.chapter-note`) live in
+ * app/globals.css; scroll-driven behaviour lives in app/motion.css.
+ * ------------------------------------------------------------------------ */
+
+/* --- Chapter rail --------------------------------------------------------- */
+
+.rail {
+  position: fixed;
+  z-index: 40;
+  top: 50%;
+  left: clamp(0.75rem, 2vw, 1.75rem);
+  translate: 0 -50%;
+  /* Decoration for orientation, not a barrier: pointer events return on the
+     links themselves so the rail never blocks the scene behind it. */
+  pointer-events: none;
+}
+
+.rail ol {
+  display: grid;
+  gap: 1.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rail a {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  pointer-events: auto;
+  /* 44px of vertical hit area without a 44px gap between the dots. */
+  padding-block: 0.55rem;
+}
+
+.railDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--on-night-muted);
+  opacity: 0.28;
+}
+
+.railNumber {
+  color: var(--on-night-muted);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-out-expo);
+}
+
+.rail a:hover .railNumber,
+.rail a:focus-visible .railNumber {
+  opacity: 0.85;
+}
+
+/*
+ * The dot brightens while its chapter is on screen. `timeline-scope` on body
+ * (below) publishes each chapter's view timeline by name, so these fixed dots
+ * can animate against elements they have no DOM relationship with — no
+ * IntersectionObserver, no scroll listener, no JS at all.
+ *
+ * Without support the rail is hidden rather than left permanently dim: it is a
+ * navigational aid, and a broken one is worse than none.
+ */
+.rail {
+  display: none;
+}
+
+@supports (timeline-scope: --ch-1) {
+  @media (min-width: 70rem) {
+    .rail {
+      display: block;
+    }
+  }
+
+  .railDot {
+    animation: rail-active linear both;
+    animation-range: cover;
+  }
+
+  .rail li:nth-child(1) .railDot { animation-timeline: --ch-1; }
+  .rail li:nth-child(2) .railDot { animation-timeline: --ch-2; }
+  .rail li:nth-child(3) .railDot { animation-timeline: --ch-3; }
+  .rail li:nth-child(4) .railDot { animation-timeline: --ch-4; }
+  .rail li:nth-child(5) .railDot { animation-timeline: --ch-5; }
+  .rail li:nth-child(6) .railDot { animation-timeline: --ch-6; }
+}
+
+@keyframes rail-active {
+  0%,
+  100% {
+    background: var(--on-night-muted);
+    opacity: 0.28;
+    scale: 1;
+  }
+  50% {
+    background: var(--gold);
+    opacity: 1;
+    scale: 1.8;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .railDot {
+    animation: none !important;
+  }
+}
+
+/* --- Shared chapter heading ---------------------------------------------- */
+
+.chapterTitle {
+  max-width: 42ch;
+  margin: 0 0 clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.chapterTitleCompact {
+  margin-bottom: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+.chapterLabel {
+  margin: 0 0 0.9rem;
+  color: var(--gold);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.chapterTitle h2 {
+  margin: 0;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: var(--step-4);
+  font-weight: 600;
+  /* Keep Japanese line breaks off small kana and prolonged sound marks. */
+  line-break: strict;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.chapterSub {
+  max-width: 46ch;
+  margin: 0.9rem 0 0;
+  color: var(--vermilion);
+  font-size: clamp(0.86rem, 1.4vw, 1rem);
+  font-style: italic;
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+}
+
+/* Each chapter publishes its scroll progress under the name the matching rail
+ * dot listens for. Dashed idents are not renamed by CSS Modules, so these stay
+ * global and match the `timeline-scope` list on body. */
+.souvenir { view-timeline-name: --ch-1; }
+.yude { view-timeline-name: --ch-2; }
+.chef { view-timeline-name: --ch-3; }
+.ingredients { view-timeline-name: --ch-4; }
+.method { view-timeline-name: --ch-5; }
+.usage { view-timeline-name: --ch-6; }
+
+/* --- 01 Italian souvenir -------------------------------------------------- */
+
+.souvenir {
+  justify-content: center;
+}
+
+/*
+ * Constrained to the same container as every other chapter.
+ *
+ * This grid used to be `width: 100%` of the viewport so the pack could bleed
+ * off the left edge. On a 1880px screen that put the photograph at x=-75,
+ * the text column at 1080px wide running into the right edge, and 395px of
+ * dead space between the two. The bleed is now a bounded pull out of the
+ * container instead of an unbounded full-viewport grid.
+ */
+.souvenirGrid {
+  width: min(calc(100% - clamp(1.5rem, 5vw, 4rem)), var(--container));
+  display: grid;
+  grid-template-columns: minmax(0, 42fr) minmax(0, 58fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+  margin-inline: auto;
+}
+
+.souvenirPack {
+  --parallax: 4%;
+
+  position: relative;
+  justify-self: start;
+  width: 100%;
+  max-width: 27rem;
+  /* Capped bleed: at most 5rem past the container edge, so the pack reads as
+     cropped by the page rather than falling off it. */
+  margin-left: calc(-1 * clamp(0.75rem, 3vw, 5rem));
+}
+
+/* The product shot is a packet on a white studio background. Left raw it
+ * punches a bright hole in a near-black page, so it is treated as a framed
+ * photograph: exposure pulled back, a warm hairline to declare the edge, and a
+ * gradient scrim along the bottom so it fades into the page instead of
+ * stopping dead. */
+.souvenirPack figure,
+.souvenirPack > span {
+  position: relative;
+  display: block;
+}
+
+.souvenirPack img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid color-mix(in srgb, var(--accent-2) 22%, transparent);
+  border-left-color: transparent;
+  border-radius: 0 var(--card-radius) var(--card-radius) 0;
+  filter: brightness(0.94) saturate(1.1) contrast(1.05);
+  box-shadow: var(--depth-far);
+  transition: filter var(--dur-slow) var(--ease-out-expo);
+}
+
+/* Full exposure on hover — the reader asked to look at it. */
+.souvenirPack:hover img {
+  filter: brightness(1.04) saturate(1.12) contrast(1.03);
+}
+
+.souvenirCaption {
+  margin: 1rem 0 0;
+  padding-left: clamp(1rem, 3vw, 5rem);
+  color: var(--on-night-muted);
+  font-size: 0.7rem;
+  line-height: 1.6;
+}
+
+.souvenirBody {
+  min-width: 0;
+}
+
+.souvenirLead {
+  margin: 0;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: var(--step-2);
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.souvenirText {
+  max-width: 56ch;
+  margin: 1.1rem 0 0;
+  color: var(--on-night-muted);
+  font-size: 0.92rem;
+  line-height: 2;
+}
+
+.featureRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.85rem, 2vw, 1.5rem);
+  margin: clamp(1.75rem, 3vw, 2.4rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.featureRow li {
+  position: relative;
+  border-top: 1px solid var(--hairline-night);
+  padding-top: 0.95rem;
+  transition: border-top-color var(--dur-base) var(--ease-out-expo);
+}
+
+.featureRow li:hover {
+  border-top-color: var(--gold);
+}
+
+.featureIndex {
+  position: absolute;
+  top: 0.7rem;
+  right: 0;
+  color: var(--gold);
+  font-family: var(--font-display), ui-serif, serif;
+  font-size: 1.5rem;
+  line-height: 1;
+  opacity: 0.28;
+}
+
+.featureKicker {
+  margin: 0;
+  color: var(--gold);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.featureRow h3 {
+  margin: 0.5rem 0 0;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.featureRow li > p:last-child {
+  margin: 0.45rem 0 0;
+  color: var(--on-night-muted);
+  font-size: 0.78rem;
+  line-height: 1.8;
+}
+
+.proposal {
+  margin-top: clamp(1.75rem, 3vw, 2.5rem);
+  border-top: 1px solid color-mix(in srgb, var(--accent-2) 34%, transparent);
+  padding-top: clamp(1.1rem, 2.2vw, 1.6rem);
+}
+
+.proposalLabel {
+  margin: 0;
+  color: var(--gold);
+  font-size: 0.68rem;
+  font-style: italic;
+  letter-spacing: 0.14em;
+}
+
+.proposalText {
+  max-width: 48ch;
+  margin: 0.5rem 0 0;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: var(--step-2);
+  line-height: 1.8;
+}
+
+/* --- 02 Yude theory ------------------------------------------------------- */
+
+.yude {
+  justify-content: center;
+}
+
+/*
+ * Three columns standing the full height of the scene. The liquid level is the
+ * salinity figure, so 1.0% / 2.5% / 0% is legible before a single numeral is
+ * read. They sit behind the copy at low opacity — instrument, not decoration.
+ */
+.yudeColumns {
+  position: absolute;
+  z-index: -1;
+  /* Same width and track sizing as .chapter-inner + .yudeReadout, so each
+     column stands directly behind the figure it represents. Mismatched
+     padding here put the 2.5% column between two readouts. */
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: min(calc(100% - clamp(1.5rem, 5vw, 4rem)), var(--container));
+  translate: -50% 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1rem, 3vw, 2.5rem);
+  justify-items: center;
+  padding-block: clamp(2rem, 6vh, 4rem);
+  pointer-events: none;
+}
+
+.tube {
+  position: relative;
+  width: min(100%, 12rem);
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--hairline-night);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fg) 4%, transparent);
+}
+
+.tubeLiquid {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 22%, transparent), color-mix(in srgb, var(--accent) 6%, transparent));
+}
+
+.tubeFeatured {
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.tubeFeatured .tubeLiquid {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent-2) 34%, transparent), color-mix(in srgb, var(--accent-2) 10%, transparent));
+  box-shadow: var(--glow-gold);
+}
+
+.yudeInner {
+  position: relative;
+}
+
+.yudeQuote {
+  display: flex;
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+  max-width: 64ch;
+  margin: 0 0 clamp(1.75rem, 3.5vw, 2.75rem);
+  border-left: 2px solid var(--vermilion);
+  padding-left: clamp(1.1rem, 3vw, 2.2rem);
+}
+
+.yudeQuote svg {
+  flex: none;
+  margin-top: 0.4rem;
+  color: var(--gold);
+}
+
+.yudeQuote p {
+  margin: 0;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: var(--step-2);
+  font-weight: 500;
+  line-height: 1.75;
+}
+
+.yudeReadout {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1rem, 3vw, 2.5rem);
+  margin: 0 0 1.5rem;
+}
+
+.yudeReadout > div {
+  min-width: 0;
+  border-top: 1px solid var(--hairline-night);
+  padding-top: 1rem;
+}
+
+.readoutFeatured {
+  border-top-color: var(--vermilion);
+}
+
+.yudeReadout dt {
+  display: grid;
+  gap: 0.4rem;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: clamp(0.95rem, 1.6vw, 1.12rem);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.readoutKicker {
+  color: var(--gold);
+  font-family: var(--font-sans), sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.yudeReadout dd {
+  margin: 0.9rem 0 0;
+}
+
+.readoutValue {
+  display: flex;
+  align-items: baseline;
+  gap: 0.15rem;
+  margin: 0;
+  color: var(--on-night);
+  font-family: var(--font-display), ui-serif, serif;
+  line-height: 1;
+}
+
+.readoutValue span {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.readoutFeatured .readoutValue {
+  color: var(--gold);
+}
+
+.readoutValue small {
+  font-size: clamp(1rem, 2vw, 1.4rem);
+}
+
+.readoutCaption {
+  margin: 0.8rem 0 0;
+  color: var(--on-night);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+.readoutBody {
+  margin: 0.5rem 0 0;
+  color: var(--on-night-muted);
+  font-size: 0.78rem;
+  line-height: 1.85;
+}
+
+/* --- 03 Chef -------------------------------------------------------------- */
+
+.chef {
+  display: grid;
+  grid-template-columns: minmax(0, 52fr) minmax(0, 48fr);
+  align-items: center;
+  padding-block: 0;
+}
+
+/* The portrait fills the right half of the viewport and the name crosses onto
+ * it, so the two halves read as one image rather than a photo beside a column. */
+.chefPortrait {
+  position: relative;
+  grid-column: 2;
+  grid-row: 1;
+  height: 100%;
+  min-height: 100svh;
+  overflow: hidden;
+}
+
+.chefScrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--night) 0%, color-mix(in srgb, var(--bg) 70%, transparent) 20%, color-mix(in srgb, var(--bg) 24%, transparent) 44%, transparent 58%);
+}
+
+.chefCaption {
+  position: absolute;
+  right: clamp(1rem, 3vw, 2.5rem);
+  bottom: clamp(1rem, 3vw, 2.5rem);
+  /* Lands on the chef's white jacket, so it cannot borrow contrast from the
+   * photograph the way the copy on the dark half does. */
+  margin: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-sunken) 74%, transparent);
+  padding: 0.35em 0.85em;
+  backdrop-filter: blur(6px);
+  color: var(--on-night-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+}
+
+/*
+ * Spans both columns so the heading can cross onto the portrait, but sits on
+ * the same container grid as every other chapter. Padding alone left the text
+ * pinned 96px from the viewport edge on a 1880px screen while the rest of the
+ * page began at 340px.
+ */
+.chefCopy {
+  position: relative;
+  z-index: 1;
+  grid-column: 1 / -1;
+  grid-row: 1;
+  align-self: center;
+  display: grid;
+  justify-items: start;
+  width: min(calc(100% - clamp(1.5rem, 5vw, 4rem)), var(--container));
+  margin-inline: auto;
+}
+
+/* The block is full width so the heading can cross onto the portrait; the
+ * measure is enforced on the children instead. */
+.chefCopy > * {
+  width: min(100%, 34rem);
+}
+
+.chefLead {
+  margin: 0;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: var(--step-2);
+  font-weight: 600;
+  line-height: 1.55;
+}
+
+.chefBio {
+  max-width: 54ch;
+  margin: 1.25rem 0 0;
+  color: var(--on-night-muted);
+  font-size: 0.9rem;
+  line-height: 2;
+}
+
+.timeline {
+  position: relative;
+  margin-top: clamp(1.75rem, 3vw, 2.6rem);
+  padding-left: clamp(1.1rem, 2.5vw, 1.85rem);
+}
+
+.timelineSpine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: var(--vermilion);
+}
+
+.timeline h3 {
+  margin: 0 0 1rem;
+  color: var(--gold);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.timeline ol {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline li {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: baseline;
+  color: var(--on-night-muted);
+  font-size: 0.85rem;
+  line-height: 1.7;
+}
+
+.timelineYear {
+  color: var(--vermilion);
+  font-family: var(--font-display), ui-serif, serif;
+  font-size: 1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- 04 Ingredients ------------------------------------------------------- */
+
+.ingredients {
+  justify-content: center;
+}
+
+.ingredientsBackdrop {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+}
+
+.ingredientsVeil {
+  position: absolute;
+  inset: 0;
+  /* Two layers with one job each. The radial opens a window over the left
+   * centre, which is the only region no text crosses — that is where the
+   * herbs stay at full exposure. The linear closes the top and bottom strips
+   * behind the title and the figures. Compositing them multiplies the
+   * transmitted light, so the window stays open only where both are clear. */
+  background:
+    radial-gradient(46% 30% at 24% 36%, color-mix(in srgb, var(--bg) 0%, transparent), color-mix(in srgb, var(--bg) 24%, transparent) 62%, color-mix(in srgb, var(--bg) 70%, transparent) 100%),
+    linear-gradient(
+      180deg,
+      var(--night) 0%,
+      color-mix(in srgb, var(--bg) 70%, transparent) 12%,
+      color-mix(in srgb, var(--bg) 8%, transparent) 26%,
+      color-mix(in srgb, var(--bg) 10%, transparent) 48%,
+      color-mix(in srgb, var(--bg) 72%, transparent) 64%,
+      color-mix(in srgb, var(--bg) 88%, transparent) 84%,
+      var(--night) 100%
+    );
+}
+
+.ingredientsInner {
+  display: grid;
+  gap: clamp(1.5rem, 4vh, 3rem);
+}
+
+.constellation {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 5vw, 4rem);
+  align-items: center;
+}
+
+/*
+ * Seven glowing nodes on a ring, one per ingredient, in the ingredient's own
+ * colour. Purely decorative — the ordered list beside it is what a screen
+ * reader gets.
+ */
+.constellationRing {
+  position: relative;
+  width: min(100%, 20rem);
+  aspect-ratio: 1;
+  justify-self: center;
+}
+
+.constellationRing::before {
+  position: absolute;
+  inset: 12%;
+  border: 1px solid color-mix(in srgb, var(--fg) 10%, transparent);
+  border-radius: 50%;
+  content: "";
+}
+
+/* Each node is a full-size layer rotated by --angle, with the dot pinned to
+ * the top edge. Positioning the dot with a percentage translate instead would
+ * resolve the percentage against the dot, not the ring. */
+.node {
+  position: absolute;
+  inset: 12%;
+  transform: rotate(var(--angle));
+}
+
+.node::before {
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  border-radius: 50%;
+  background: var(--swatch);
+  /* The ring keeps the palest swatch (salt) and the darkest (basil) both
+     visible against the photograph. */
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--fg) 22%, transparent),
+    0 0 22px -2px var(--swatch);
+  content: "";
+}
+
+.composition {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.compositionLabel {
+  margin-bottom: 0.6rem;
+  color: var(--gold);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.composition li:not(.compositionLabel) {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--hairline-night);
+  padding: 0.6rem 0;
+  color: var(--on-night);
+  font-size: 0.88rem;
+  transition: color var(--dur-fast) var(--ease-out-expo);
+}
+
+.composition li:not(.compositionLabel):hover {
+  color: var(--gold);
+}
+
+.swatch {
+  flex: none;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--fg) 20%, transparent);
+  transition: transform var(--dur-base) var(--ease-out-expo);
+}
+
+.composition li:hover .swatch {
+  transform: scale(1.35);
+}
+
+.grams {
+  margin-left: auto;
+  color: var(--on-night-muted);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.statRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0;
+  border-top: 1px solid var(--hairline-night);
+  padding-top: clamp(1rem, 2vw, 1.6rem);
+}
+
+.statRow dd {
+  display: flex;
+  align-items: baseline;
+  gap: 0.15rem;
+  margin: 0;
+  color: var(--gold);
+  font-family: var(--font-display), ui-serif, serif;
+  line-height: 1;
+}
+
+.statRow dd span {
+  font-size: clamp(2.2rem, 5.5vw, 3.6rem);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.statRow dd small {
+  font-size: clamp(0.8rem, 1.4vw, 1rem);
+}
+
+.statRow dt {
+  margin-top: 0.4rem;
+  color: var(--on-night-muted);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* --- 05 Method ------------------------------------------------------------ */
+
+/* Not `.chapter`: this scene is taller than the viewport by design, because the
+ * sticky column needs somewhere to stick through. */
+.method {
+  position: relative;
+  padding-block: clamp(4rem, 9vh, 7rem);
+}
+
+.methodGrid {
+  width: min(calc(100% - clamp(1.5rem, 5vw, 4rem)), var(--container));
+  display: grid;
+  grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: start;
+  margin-inline: auto;
+}
+
+/* Holds the quantities on screen for the whole method — the offset clears the
+ * sticky header. */
+.methodAside {
+  position: sticky;
+  top: 7.5rem;
+  border-left: 2px solid var(--vermilion);
+  padding-left: clamp(1.1rem, 2.5vw, 1.75rem);
+}
+
+.methodBlock {
+  margin-top: 2rem;
+}
+
+.methodBlock h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.9rem;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.methodBlock h3 svg {
+  color: var(--gold);
+}
+
+.equipmentList {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  color: var(--on-night-muted);
+  font-size: 0.84rem;
+  list-style: none;
+}
+
+.equipmentList li::before {
+  color: var(--gold);
+  content: "・";
+}
+
+.quantityList {
+  margin: 0;
+}
+
+.quantityList > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--hairline-night);
+  padding: 0.55rem 0;
+  font-size: 0.84rem;
+}
+
+.quantityList dt {
+  color: var(--on-night-muted);
+}
+
+.quantityList dd {
+  margin: 0;
+  color: var(--on-night);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.quantityHighlight dt,
+.quantityHighlight dd {
+  color: var(--vermilion);
+  font-weight: 700;
+}
+
+.methodLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1.6rem;
+  border-bottom: 1px solid currentcolor;
+  color: var(--gold);
+  padding-bottom: 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: color var(--dur-base) var(--ease-out-expo), gap var(--dur-base) var(--ease-out-expo);
+}
+
+.methodLink:hover {
+  gap: 0.7rem;
+  color: var(--vermilion);
+}
+
+.methodSteps {
+  min-width: 0;
+}
+
+.methodStepsLabel {
+  margin: 0 0 1.1rem;
+  color: var(--gold);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.methodSteps ol {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0 0 1.2rem;
+  padding: 0;
+  list-style: none;
+}
+
+.methodSteps li {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr);
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+  align-items: start;
+  border: 1px solid var(--hairline-night);
+  border-radius: 14px;
+  background: var(--night-soft);
+  padding: clamp(1rem, 2vw, 1.5rem) clamp(0.9rem, 2vw, 1.5rem);
+  transition:
+    transform var(--dur-slow) var(--ease-out-expo),
+    border-color var(--dur-slow) var(--ease-out-expo);
+}
+
+.methodSteps li:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--fg) 16%, transparent);
+}
+
+.methodSteps li p {
+  /* Capped for English: at 800px this measured about 90 characters a line,
+     well past the 65-75 the eye tracks comfortably. Japanese sets about twice
+     as wide per character, so the cap only bites on the English copy. */
+  max-width: 68ch;
+  margin: 0;
+  color: var(--on-night);
+  font-size: clamp(0.88rem, 1.5vw, 0.98rem);
+  line-height: 1.85;
+}
+
+.stepNumber {
+  color: var(--vermilion);
+  font-family: var(--font-display), ui-serif, serif;
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  font-style: italic;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* Specificity has to match `.methodSteps li` for the fill to win. */
+.methodSteps li.stepFinal {
+  border-color: color-mix(in srgb, var(--accent-2) 34%, transparent);
+  background: var(--night-elevated);
+  box-shadow: var(--glow-gold);
+}
+
+.stepFinal .stepNumber {
+  color: var(--gold);
+}
+
+/* --- 06 Usage ------------------------------------------------------------- */
+
+.usage {
+  justify-content: center;
+}
+
+.usageInner {
+  display: grid;
+  justify-items: start;
+}
+
+.plateGrid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(0.6rem, 1.6vw, 1.1rem);
+}
+
+/* Four across: offsets run -1.5, -0.5, 0.5, 1.5 out from the row centre, so
+ * the deck converges inward at rest and every frame of the unfurl stays inside
+ * the row's own bounds. See the two-column override further down. */
+.plateGrid figure:nth-child(1) { --fan-offset: -1.5; }
+.plateGrid figure:nth-child(2) { --fan-offset: -0.5; }
+.plateGrid figure:nth-child(3) { --fan-offset: 0.5; }
+.plateGrid figure:nth-child(4) { --fan-offset: 1.5; }
+
+.plateGrid figure {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  margin: 0;
+  border: 1px solid var(--hairline-night);
+  border-radius: 16px;
+  background: var(--night-soft);
+  box-shadow: var(--depth-mid);
+  transition:
+    box-shadow var(--dur-slow) var(--ease-out-expo),
+    border-color var(--dur-slow) var(--ease-out-expo);
+}
+
+/* The unfurl owns `transform` on this element, so hover changes depth and the
+ * caption rather than trying to scale it as well. */
+.plateGrid figure:hover {
+  border-color: color-mix(in srgb, var(--accent-2) 45%, transparent);
+  box-shadow: var(--depth-far);
+}
+
+.plateGrid img {
+  object-fit: cover;
+  transform: scale(1.001);
+  transition: transform 650ms var(--ease-out-expo), filter var(--dur-slow) var(--ease-out-expo);
+}
+
+.plateGrid figure:hover img {
+  transform: scale(1.06);
+  filter: saturate(1.08) contrast(1.03);
+}
+
+.plateGrid figcaption {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--night) 88%, transparent);
+  color: var(--on-night);
+  padding: 0.6rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.usageFallback {
+  margin: 0;
+  color: var(--on-night-muted);
+  font-size: 0.86rem;
+}
+
+.usageInner :global(.section-link) {
+  margin-top: clamp(1.25rem, 2.5vw, 1.8rem);
+}
+
+/* --- Closing call to action ----------------------------------------------- */
+
+.finalCta {
+  position: relative;
+  min-height: clamp(30rem, 68svh, 44rem);
+  display: flex;
+  align-items: center;
+  overflow: clip;
+  isolation: isolate;
+}
+
+.finalCtaScene {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  overflow: hidden;
+}
+
+.finalCtaScene img {
+  object-fit: cover;
+}
+
+.finalCtaVeil {
+  position: absolute;
+  inset: 0;
+  /* The banner photograph reserves its left 48% for copy; the veil follows
+     that so the headline never lands on the plate. */
+  background: linear-gradient(90deg, var(--night) 0%, color-mix(in srgb, var(--bg) 92%, transparent) 40%, color-mix(in srgb, var(--bg) 30%, transparent) 72%, transparent);
+}
+
+.finalCtaCopy {
+  max-width: 34rem;
+}
+
+.finalCtaCopy h2 {
+  margin: 0.7rem 0 0;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: var(--step-4);
+  font-weight: 600;
+  line-break: strict;
+  line-height: 1.18;
+}
+
+.finalCtaCopy > p {
+  max-width: 34rem;
+  margin: 0.8rem 0 0;
+  color: var(--on-night-muted);
+  font-size: 0.88rem;
+  line-height: 1.9;
+}
+
+.finalCtaWeight {
+  color: var(--gold) !important;
+  font-family: var(--font-display), ui-serif, serif;
+  font-size: 1.1rem !important;
+}
+
+.finalCtaCopy :global(.btn-primary) {
+  margin-top: 1.7rem;
+}
+
+/* --- Responsive ----------------------------------------------------------- */
+
+@media (max-width: 69.99rem) {
+  .souvenirGrid,
+  .constellation {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .souvenirPack {
+    justify-self: center;
+    width: min(100%, 22rem);
+    margin-left: 0;
+  }
+
+  .souvenirCaption {
+    padding-left: 0;
+  }
+
+  .souvenirBody {
+    padding-right: 0;
+  }
+
+  /* Stacked: the portrait becomes a band above the copy rather than a half. */
+  .chef {
+    grid-template-columns: minmax(0, 1fr);
+    padding-block: clamp(4rem, 9vh, 7rem);
+  }
+
+  .chefPortrait {
+    grid-column: 1;
+    min-height: 46svh;
+    border-radius: var(--card-radius);
+  }
+
+  .chefScrim {
+    background: linear-gradient(0deg, var(--night) 0%, color-mix(in srgb, var(--bg) 40%, transparent) 45%, transparent);
+  }
+
+  .chefCopy {
+    grid-column: 1;
+    grid-row: 2;
+    padding-right: 0;
+    margin-top: 2rem;
+  }
+
+  .methodGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Stacked, the aside sits above the steps, so pinning it would push the
+     method off screen. */
+  .methodAside {
+    position: static;
+  }
+
+  .constellationRing {
+    width: min(100%, 20rem);
+  }
+}
+
+@media (max-width: 47.99rem) {
+  .featureRow,
+  .yudeReadout,
+  .statRow {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+
+  .yudeColumns {
+    gap: 0.75rem;
+    padding-inline: 1rem;
+  }
+
+  .tube {
+    width: 100%;
+  }
+
+  .plateGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Two columns means two positions. Keeping the four-across offsets would
+     send the second and third cards outward past the page edge, because they
+     would be converging on a centre that is no longer between them. */
+  .plateGrid figure:nth-child(odd) { --fan-offset: -0.5; }
+  .plateGrid figure:nth-child(even) { --fan-offset: 0.5; }
+
+  .plateGrid figure {
+    aspect-ratio: 1;
+  }
+
+  .methodSteps li {
+    grid-template-columns: 3rem minmax(0, 1fr);
+  }
+
+  .finalCtaVeil {
+    background: linear-gradient(0deg, var(--night) 0%, color-mix(in srgb, var(--bg) 88%, transparent) 55%, color-mix(in srgb, var(--bg) 55%, transparent));
+  }
+}

@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: moor-spice
+    runtime: node
+    plan: starter
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/health
+    disk:
+      name: moor-spice-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: 24
+      - key: DEPLOYMENT_MODE
+        value: catalog
+      - key: CATALOG_BACKEND
+        value: local-json
+      - key: CATALOG_LOCAL_PATH
+        value: /var/data/catalog.json
+      - key: UPLOADS_PATH
+        value: /var/data/uploads
+      - key: SITE_INDEXING_ENABLED
+        value: "false"
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: RATE_LIMIT_SECRET
+        generateValue: true
+      - key: ADMIN_SESSION_VERSION
+        value: "1"
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD_HASH
+        sync: false
+      - key: ADMIN_DISPLAY_NAME
+        value: Quản trị viên
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false

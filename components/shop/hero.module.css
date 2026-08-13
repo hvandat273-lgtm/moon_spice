@@ -1,0 +1,507 @@
+/* The hero stage: ambient backdrop, wordmark, product plane, ledger.
+ * See app/motion.css for the scroll-driven primitives it consumes. */
+
+/* ---------------------------------------------------------------------------
+ * Hero — a full-viewport stage rather than a banner. Three depth planes stack
+ * back to front: an ambient photograph, the wordmark, and the product standing
+ * in front of the letters. The product overlapping the type is what makes the
+ * scene read as space rather than as layers of flat art.
+ * ------------------------------------------------------------------------ */
+
+.hero {
+  position: relative;
+  /* One height formula at every width prevents the 767/768px breakpoint from
+     changing the hero by more than 100px. Short windows scroll naturally;
+     very tall desktops stop growing before the photograph becomes empty. */
+  min-height: clamp(42rem, calc(100svh - 7rem), 58rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: clip;
+  isolation: isolate;
+  background: var(--bg);
+  color: var(--fg);
+  padding-block: clamp(1rem, 3vh, 2.5rem);
+}
+
+/* Backdrop, pushed far out of focus so the product reads as the only sharp
+ * object on stage. */
+.heroAmbient {
+  --parallax: 2%;
+
+  position: absolute;
+  z-index: -3;
+  inset: 0;
+  overflow: hidden;
+}
+
+.heroAmbientPicture {
+  position: absolute;
+  inset: 0;
+  display: block;
+  transform: translate3d(var(--hero-shift-x, 0), var(--hero-shift-y, 0), 0);
+  transition: transform 800ms var(--ease-out-expo);
+  will-change: transform;
+}
+
+.hero[data-looking="true"] .heroAmbientPicture {
+  transition-duration: 140ms;
+}
+
+.heroAmbientImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--hero-focal-x, 54%) var(--hero-focal-y, 50%);
+  /* Brightness stays near 1 and the scrim below does the contrast work.
+   * Darkening the whole photograph AND laying a heavy veil over it stacked
+   * two dimmers on the product and left it unreadable. */
+  filter: saturate(1.02) brightness(0.96) contrast(1.06);
+  transform: scale(1.04);
+}
+
+/* The background behaves like a very restrained product-film camera move:
+ * a shallow push and lateral drift make the pouch feel separated from the
+ * tabletop. It stays subtle enough that the product label never swims behind
+ * the copy, and it is deliberately disabled for small screens and reduced
+ * motion users. */
+@media (prefers-reduced-motion: no-preference) and (min-width: 48rem) {
+  .heroAmbientImage {
+    animation: hero-camera-drift 14s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  .heroCinematicLight {
+    position: absolute;
+    z-index: 1;
+    inset: -20% -35%;
+    pointer-events: none;
+    background: linear-gradient(
+      112deg,
+      transparent 42%,
+      rgb(255 247 224 / 0.02) 47%,
+      rgb(255 247 224 / 0.14) 50%,
+      rgb(255 247 224 / 0.025) 53%,
+      transparent 58%
+    );
+    mix-blend-mode: screen;
+    transform: translate3d(-18%, 0, 0) rotate(-4deg);
+    animation: hero-light-pass 14s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  .heroCinematicBloom {
+    position: absolute;
+    z-index: 1;
+    inset: -8%;
+    pointer-events: none;
+    background: radial-gradient(34% 54% at 49% 37%, rgb(255 233 185 / 0.1), transparent 72%);
+    transform: translate3d(var(--hero-bloom-x, 0), var(--hero-bloom-y, 0), 0);
+    transition: transform 800ms var(--ease-out-expo);
+    animation: hero-bloom-breathe 7s ease-in-out infinite alternate;
+    will-change: transform, opacity;
+  }
+
+  .hero[data-looking="true"] .heroCinematicBloom {
+    transition-duration: 140ms;
+  }
+}
+
+@keyframes hero-camera-drift {
+  from {
+    transform: scale(1.055) translate3d(-0.35%, 0.2%, 0);
+  }
+  to {
+    transform: scale(1.105) translate3d(0.45%, -0.55%, 0);
+  }
+}
+
+@keyframes hero-light-pass {
+  from {
+    transform: translate3d(-18%, 0, 0) rotate(-4deg);
+  }
+  to {
+    transform: translate3d(18%, -1%, 0) rotate(-4deg);
+  }
+}
+
+@keyframes hero-bloom-breathe {
+  from { opacity: 0.4; }
+  to { opacity: 0.9; }
+}
+
+.heroVeil {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  /* Directional, not a blanket. The product sits centre, so the middle band is
+   * left almost clear and the scrim only builds where type actually lands:
+   * the top strip under the header and the bottom strip behind the ledger. */
+  background:
+    radial-gradient(80% 84% at 52% 46%, color-mix(in srgb, var(--bg) 0%, transparent), color-mix(in srgb, var(--bg) 48%, transparent) 84%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--bg) 78%, transparent) 0%,
+      color-mix(in srgb, var(--bg) 30%, transparent) 16%,
+      color-mix(in srgb, var(--bg) 8%, transparent) 40%,
+      color-mix(in srgb, var(--bg) 10%, transparent) 58%,
+      color-mix(in srgb, var(--bg) 72%, transparent) 76%,
+      color-mix(in srgb, var(--bg) 96%, transparent) 100%
+    );
+}
+
+.heroStage {
+  position: relative;
+  width: min(calc(100% - var(--shell-inline-space)), var(--shell-max));
+  flex: 1;
+  display: grid;
+  /* One cell: the eyebrow, the wordmark and the product are all stacked in the
+     same grid area and separated with align-self, so the product can overlap
+     the letters without any magic-number offsets. */
+  grid-template-areas: "stage";
+  place-items: stretch;
+  margin-inline: auto;
+  min-height: 0;
+}
+
+.heroStage > * {
+  grid-area: stage;
+}
+
+/* Halo behind the type that sits on the photograph. Keeps the eyebrow and
+ * the ledger legible without pulling the exposure down on the product. */
+.heroEyebrow,
+.heroProductName,
+.heroDescription {
+  text-shadow:
+    0 1px 2px rgb(var(--shadow-rgb) / 80%),
+    0 2px 14px rgb(var(--shadow-rgb) / 60%);
+}
+
+.heroEyebrow {
+  position: relative;
+  z-index: 2;
+  /* Sits directly over the lit face of the pouch. Tracked-out gold micro-caps
+   * have almost no stroke area to carry contrast there, so the label brings
+   * its own ground rather than asking the photograph to be darker. */
+  align-self: center;
+  margin: 0;
+  border: 1px solid color-mix(in srgb, var(--accent-2) 28%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-sunken) 78%, transparent);
+  padding: 0.42em 1.15em 0.42em 1.5em;
+  backdrop-filter: blur(6px);
+  color: var(--accent-2);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.36em;
+  text-align: center;
+  text-transform: uppercase;
+  text-indent: 0.36em;
+}
+
+.heroWordmark {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  align-self: center;
+  margin: 0;
+  color: transparent;
+  font-family: var(--font-display), Georgia, "Times New Roman", ui-serif, serif;
+  /* Two stacked lines rather than one: at a single line this runs past both
+     edges of a 1320px stage, and stacking puts the seam right where the
+     product crosses it. */
+  /* A single continuous scale across phones, tablets and desktops. Previous
+     breakpoint rules made the wordmark shrink when the viewport grew. */
+  font-size: clamp(3.6rem, calc(2.2rem + 7vw), 8.5rem);
+  font-weight: 400;
+  justify-items: center;
+  letter-spacing: 0.03em;
+  line-height: 0.82;
+  text-align: center;
+  -webkit-text-stroke: 1.5px color-mix(in srgb, var(--fg) 92%, transparent);
+  user-select: none;
+}
+
+.heroWord {
+  display: block;
+  white-space: nowrap;
+}
+
+.heroWord > span {
+  display: inline-block;
+  animation: hero-char-in 1s var(--ease-out-expo) both;
+  animation-delay: calc(var(--i, 0) * 55ms + 120ms);
+}
+
+@keyframes hero-char-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.36em);
+    filter: blur(9px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.heroCopy {
+  grid-area: stage;
+  align-self: center;
+  width: 100%;
+  margin-inline: auto;
+  padding-block: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.heroSeal {
+  position: relative;
+  z-index: 3;
+  margin-right: clamp(0rem, 2vw, 2.5rem);
+  width: clamp(96px, 9vw, 132px);
+  aspect-ratio: 1;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  place-self: center end;
+  border: 1px solid color-mix(in srgb, var(--fg) 75%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--olive) 70%, transparent);
+  backdrop-filter: blur(6px);
+  color: var(--fg);
+  text-align: center;
+  translate: var(--hero-seal-x, 0) var(--hero-seal-y, 0);
+  transition: translate 700ms var(--ease-out-expo), border-color var(--dur-base) var(--ease-out-expo);
+}
+
+.hero[data-looking="true"] .heroSeal {
+  transition-duration: 160ms, var(--dur-base);
+}
+
+.heroSealRing {
+  position: absolute;
+  inset: -11px;
+  width: calc(100% + 22px);
+  height: calc(100% + 22px);
+  pointer-events: none;
+}
+
+.heroSealRing circle {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 1;
+  stroke-dasharray: 0.6 3.4;
+  stroke-linecap: round;
+}
+
+.heroSeal span {
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+}
+
+.heroSeal small {
+  /* Wide enough to keep the phrase on one line inside the disc. */
+  max-width: 13em;
+  color: var(--on-night-muted);
+  font-size: 0.5rem;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+}
+
+/* Bottom ledger: the specification block, laid out as three columns that read
+   left to right — what it is, what it does, what to do next. */
+.heroLedger {
+  position: relative;
+  z-index: 3;
+  width: min(100%, 980px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  align-items: end;
+  justify-items: center;
+  margin-top: clamp(1.5rem, 5vh, 3.5rem);
+  border-top: 1px solid color-mix(in srgb, var(--fg) 28%, transparent);
+  padding-top: clamp(1rem, 2.5vh, 1.6rem);
+  text-align: center;
+}
+.heroLedgerName {
+  min-width: 0;
+}
+
+.heroRule {
+  display: block;
+  width: 2.75rem;
+  height: 2px;
+  margin-bottom: 0.85rem;
+  background: var(--burgundy);
+}
+
+.heroProductName {
+  margin: 0;
+  color: var(--fg);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: var(--step-2);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+}
+
+.heroDescription {
+  max-width: 22rem;
+  margin: 0;
+  color: color-mix(in srgb, var(--fg) 70%, transparent);
+  font-size: 0.86rem;
+  line-height: 1.9;
+}
+
+.heroActions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  margin-top: 0;
+}
+
+.heroAsideNote {
+  display: none;
+}
+
+.heroScrollCue {
+  position: absolute;
+  z-index: 3;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  height: clamp(30px, 4vh, 52px);
+  background: linear-gradient(180deg, transparent, var(--accent));
+}
+
+/* Tablet: the specification block gains two stable columns, while the CTA row
+ * spans both. The wordmark remains centred until the header also becomes a
+ * desktop header, so the two systems switch together. */
+@media (min-width: 48rem) {
+  .heroLedger {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    column-gap: clamp(1.5rem, 5vw, 3.5rem);
+    row-gap: 1.5rem;
+    justify-items: stretch;
+    text-align: left;
+  }
+
+  .heroActions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+}
+
+/* Compact desktop: header, wordmark and hero copy now share the same left
+ * axis. The font keeps the base fluid scale, so crossing 1024px only changes
+ * composition, never the apparent type size. */
+@media (min-width: 64rem) {
+  .heroWordmark {
+    width: min(46%, 34rem);
+    align-self: flex-start;
+    justify-items: start;
+    text-align: left;
+  }
+
+  .heroSeal {
+    width: clamp(96px, 8vw, 120px);
+    display: flex;
+  }
+}
+
+/* Full desktop: there is enough room for the ledger's action column without
+ * forcing copy or buttons into the product label. */
+@media (min-width: 80rem) {
+  .heroLedger {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr) auto;
+  }
+
+  .heroActions {
+    grid-column: auto;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 0.9rem;
+  }
+}
+
+@media (max-width: 47.99rem) {
+  .heroAmbientImage {
+    object-position: var(--hero-mobile-focal-x, 62%) var(--hero-mobile-focal-y, 50%);
+    filter: saturate(1.02) brightness(0.94) contrast(1.06);
+  }
+
+  .heroVeil {
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--bg) 72%, transparent) 0%, color-mix(in srgb, var(--bg) 10%, transparent) 30%, color-mix(in srgb, var(--bg) 55%, transparent) 78%, color-mix(in srgb, var(--bg) 94%, transparent) 100%),
+      linear-gradient(90deg, color-mix(in srgb, var(--bg) 18%, transparent), transparent 80%);
+  }
+
+  .heroCopy {
+    padding-block: 0.75rem;
+  }
+
+  .heroEyebrow {
+    font-size: 0.6rem;
+    letter-spacing: 0.28em;
+  }
+
+  .heroWordmark {
+    line-height: 0.86;
+  }
+
+  .heroProductName {
+    font-size: clamp(1rem, 4vw, 1.2rem);
+  }
+
+  .heroDescription {
+    max-width: 28rem;
+    font-size: 0.8rem;
+    line-height: 1.8;
+  }
+
+  .heroRule {
+    margin-inline: auto;
+  }
+
+  .heroScrollCue {
+    display: none;
+  }
+}
+
+/* Small phones retain every piece of content, but controls and copy are
+ * constrained to the available 288px content width at the 320px floor. */
+@media (max-width: 29.99rem) {
+  .heroEyebrow {
+    max-width: 100%;
+    padding-inline: 1em 1.25em;
+    font-size: 0.56rem;
+    letter-spacing: 0.22em;
+  }
+
+  .heroLedger {
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    padding-top: 0.9rem;
+  }
+
+  .heroActions :global(.magnetic),
+  .heroActions :global(.btn-primary) {
+    width: min(100%, 18rem);
+  }
+}

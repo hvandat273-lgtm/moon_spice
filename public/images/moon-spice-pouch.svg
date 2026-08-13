@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 620" role="img" aria-labelledby="title desc">
+  <title id="title">Túi gia vị Moon Spice</title>
+  <desc id="desc">Túi giấy kraft trong suốt chứa hỗn hợp thảo mộc khô</desc>
+  <defs>
+    <linearGradient id="kraft" x1="0" x2="1"><stop stop-color="#c99e67"/><stop offset=".5" stop-color="#e2bd87"/><stop offset="1" stop-color="#b98b54"/></linearGradient>
+    <linearGradient id="window" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#65713b"/><stop offset="1" stop-color="#263018"/></linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="15" stdDeviation="14" flood-opacity=".2"/></filter>
+    <pattern id="herbs" width="36" height="34" patternUnits="userSpaceOnUse">
+      <circle cx="7" cy="9" r="4" fill="#8f201c"/><path d="m19 5 9 7-6 8-10-5Z" fill="#84934e"/><circle cx="29" cy="28" r="3" fill="#c59a42"/><path d="m3 25 11-5 4 9-12 3Z" fill="#4c5b2a"/>
+    </pattern>
+  </defs>
+  <g filter="url(#shadow)">
+    <path d="M62 30h336l15 530c1 21-16 38-37 38H84c-21 0-38-17-37-38L62 30Z" fill="url(#kraft)"/>
+    <path d="M64 58h332" stroke="#8d673e" stroke-width="4" opacity=".7"/>
+    <path d="M70 79h320" stroke="#f1d5ac" stroke-width="3" opacity=".7"/>
+    <rect x="86" y="128" width="288" height="398" rx="18" fill="url(#window)"/>
+    <rect x="86" y="128" width="288" height="398" rx="18" fill="url(#herbs)" opacity=".88"/>
+    <path d="M103 145h238l-44 360H116Z" fill="#fff" opacity=".07"/>
+    <rect x="103" y="247" width="254" height="136" rx="4" fill="#fffdf8" stroke="#8f201c" stroke-width="4"/>
+    <circle cx="230" cy="279" r="15" fill="#4b512b"/>
+    <path d="M232 267c-8 6-9 14-2 22-2-8 1-13 9-17-2-3-4-4-7-5Z" fill="#f7f3ea"/>
+    <text x="230" y="318" text-anchor="middle" fill="#8f201c" font-family="Georgia,serif" font-size="24" letter-spacing="6">MOON SPICE</text>
+    <text x="230" y="347" text-anchor="middle" fill="#2e2a24" font-family="Arial,sans-serif" font-size="13" letter-spacing="1.5">ITALIAN HERB SEASONING</text>
+    <text x="230" y="368" text-anchor="middle" fill="#625c52" font-family="Arial,sans-serif" font-size="11">THẢO MỘC • TỎI • TIÊU</text>
+  </g>
+</svg>

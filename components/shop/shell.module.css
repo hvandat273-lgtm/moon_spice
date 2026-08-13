@@ -1,0 +1,455 @@
+/* Announcement bar, sticky header (with the locale switch) and footer.
+ * Shared across every route. */
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.announcement {
+  min-height: 27px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 1rem;
+  background: var(--night);
+  color: var(--on-night-muted);
+  font-size: 0.67rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  line-height: 1.3;
+  text-align: center;
+}
+
+/* Glass bar that condenses as the reader leaves the hero. The padding and the
+ * veil opacity are custom properties driven by the `header-condense` scroll
+ * timeline in motion.css, so no JS scroll listener is involved. */
+/* Dark chrome. A cream bar directly above the night hero read as a seam
+ * across the top of the page; carrying the night palette through the header
+ * lets the masthead and the stage behave as one surface. */
+.siteHeader {
+  position: sticky;
+  z-index: 50;
+  top: 0;
+  view-transition-name: site-header;
+  border-bottom: 1px solid var(--hairline-night);
+  background: color-mix(in srgb, var(--bg) var(--header-veil, 90%), transparent);
+  backdrop-filter: blur(18px) saturate(1.2);
+  color: var(--on-night);
+  box-shadow: 0 10px 30px -14px rgb(var(--shadow-rgb) / calc(var(--header-shade, 0) * 70%));
+}
+
+/* Reading progress hairline. scaleX is driven by the root scroll timeline. */
+.headerProgress {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  transform: scaleX(0);
+  background: linear-gradient(90deg, var(--vermilion), var(--gold-soft));
+}
+
+.headerInner {
+  width: min(calc(100% - var(--shell-inline-space)), var(--shell-max));
+  display: grid;
+  /* Logo, nav, locale switch. The third column used to be an empty
+     counterweight that existed only to keep the nav optically centred. */
+  grid-template-columns: minmax(180px, 0.8fr) minmax(430px, 2fr) minmax(120px, 0.8fr);
+  align-items: center;
+  gap: 1.25rem;
+  margin-inline: auto;
+  padding-block: var(--header-pad, 17px);
+  transition: padding-block var(--dur-slow) var(--ease-out-expo);
+}
+
+.headerLocale {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ---------------------------------------------------------------------------
+ * Locale switch — a two-option segmented control.
+ * ------------------------------------------------------------------------ */
+
+.localeSwitch {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--hairline-night);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fg) 5%, transparent);
+}
+
+.localeButton {
+  /* 44px of hit area without a 44px-tall pill: the padding carries the target
+     while the visible chip stays proportionate to the header. */
+  min-width: 44px;
+  min-height: 34px;
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--on-night-muted);
+  padding: 0.3rem 0.65rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  transition:
+    background var(--dur-fast) var(--ease-out-expo),
+    color var(--dur-fast) var(--ease-out-expo);
+}
+
+.localeButton:hover {
+  color: var(--on-night);
+}
+
+/* The selected state carries a background AND extra weight, so it does not
+ * rely on colour perception alone. */
+.localeButton[data-active] {
+  background: var(--gold);
+  color: var(--night);
+  font-weight: 800;
+}
+
+.logoLink {
+  display: inline-flex;
+  width: 210px;
+  align-items: center;
+}
+
+.logoLink img {
+  width: 100%;
+  height: auto;
+  /* No invert: the brand mark keeps its own colours on the dark bar. */
+  filter: none;
+}
+
+.desktopNav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1rem, 2vw, 2.25rem);
+  font-size: 0.83rem;
+  font-weight: 500;
+}
+
+.desktopNav a {
+  position: relative;
+  padding-block: 1.2rem;
+  white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease-out-expo);
+}
+
+.desktopNav a:hover {
+  color: var(--gold-on-night);
+}
+
+/* Underline grows from the centre out rather than sweeping across, which
+ * reads as the link answering rather than being wiped. */
+.desktopNav a::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0.65rem;
+  left: 0;
+  height: 1px;
+  transform: scaleX(0);
+  background: var(--burgundy);
+  transition: transform var(--dur-base) var(--ease-out-expo);
+}
+
+.desktopNav a:hover::after,
+.desktopNav a:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.desktopNav a::after {
+  background: var(--gold-on-night);
+}
+
+.mobileMenu {
+  display: none;
+}
+
+.footer {
+  position: relative;
+  margin-top: 0;
+  overflow: clip;
+  border-top: 1px solid var(--gold-soft);
+  background: var(--night);
+  color: var(--on-night-muted);
+  isolation: isolate;
+}
+
+/* Ghost wordmark bled off the bottom edge. Sits behind everything and is
+ * hidden from assistive tech — the real wordmark is the logo above it. */
+.footerWordmark {
+  position: absolute;
+  z-index: -1;
+  right: 0;
+  bottom: -0.24em;
+  left: 0;
+  color: transparent;
+  font-family: var(--font-display), Georgia, "Times New Roman", ui-serif, serif;
+  font-size: clamp(4rem, 15vw, 13rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 0.8;
+  text-align: center;
+  white-space: nowrap;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--fg) 7%, transparent);
+  user-select: none;
+}
+
+.footerInner {
+  position: relative;
+  width: min(calc(100% - var(--shell-inline-space)), var(--shell-max));
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, 1fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  margin-inline: auto;
+  padding-block: 4.5rem 3.5rem;
+}
+
+.footerBrand img {
+  width: 220px;
+  height: auto;
+  margin-bottom: 1rem;
+  filter: none;
+}
+
+.footerBrand p {
+  max-width: 28rem;
+  margin: 0 0 1.3rem;
+}
+
+.footerInner h2 {
+  margin: 0 0 1.25rem;
+  color: var(--on-night);
+  font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.footerInner > div:not(.footerBrand),
+.footerBrand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.footerInner a,
+.footerInner span {
+  max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.footerInner a {
+  transition: color var(--dur-fast) var(--ease-out-expo);
+}
+
+.footerInner a:hover {
+  color: var(--gold-on-night);
+}
+
+.footerBottom {
+  position: relative;
+  width: min(calc(100% - var(--shell-inline-space)), var(--shell-max));
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-inline: auto;
+  border-top: 1px solid var(--hairline-night);
+  padding-block: 1.25rem;
+  font-size: 0.72rem;
+}
+
+@media (max-width: 63.99rem) {
+  .headerInner {
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    min-height: 70px;
+  }
+
+  .mobileMenu {
+    position: static;
+    display: block;
+  }
+
+  .mobileMenu summary {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .mobileMenu summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* Anchoring to the real header edge avoids the gap/overlap created by a
+   * hard-coded fixed top while the sticky header condenses. Short landscape
+   * screens scroll inside the panel instead of pushing links off-screen. */
+  .mobileMenuPanel {
+    position: absolute;
+    z-index: 80;
+    top: 100%;
+    right: 0;
+    left: 0;
+    max-height: min(36rem, calc(100svh - 5.75rem));
+    overflow-y: auto;
+    border-top: 1px solid var(--hairline-night);
+    border-bottom: 1px solid var(--hairline-night);
+    background: color-mix(in srgb, var(--bg) 98%, transparent);
+    backdrop-filter: blur(20px);
+    color: var(--on-night);
+    padding: 1.5rem max(1rem, calc(var(--shell-inline-space) / 2)) 2rem;
+    box-shadow: 0 22px 48px rgb(var(--shadow-rgb) / 45%);
+  }
+
+  .mobileMenuPanel nav {
+    display: grid;
+  }
+
+  .mobileLocale {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Only one switch is ever visible: the header row has no space for it once
+     the nav collapses into the sheet. */
+  .headerLocale {
+    display: none;
+  }
+
+  .mobileMenuPanel nav a {
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--hairline-night);
+    padding: 0.9rem 0.15rem;
+    font-family: var(--font-display), "Noto Serif JP", ui-serif, serif;
+    font-size: 1.15rem;
+    letter-spacing: 0.02em;
+    /* Staggered entrance, keyed off --i set on each link in the markup. */
+    animation: mobile-link-in var(--dur-slow) var(--ease-out-expo) both;
+    animation-delay: calc(var(--i, 0) * 45ms + 40ms);
+  }
+
+  .mobileMenuPanel nav a svg {
+    color: var(--vermilion-on-night);
+    transition: transform var(--dur-fast) var(--ease-out-expo);
+  }
+
+  .mobileMenuPanel nav a:hover svg {
+    transform: translateX(4px);
+  }
+
+  @keyframes mobile-link-in {
+      from {
+        opacity: 0;
+        translate: 0 0.75rem;
+      }
+      to {
+        opacity: 1;
+        translate: 0 0;
+      }
+    }
+
+  .logoLink {
+    width: clamp(9.5rem, 24vw, 11.5rem);
+    justify-self: center;
+  }
+
+  .desktopNav {
+    display: none;
+  }
+
+  .footerInner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.5rem clamp(1.5rem, 5vw, 3.5rem);
+  }
+
+  .footerBrand {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 48rem) and (max-width: 63.99rem) {
+  .footerInner {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 47.99rem) {
+  .announcement {
+    min-height: 30px;
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+  }
+
+  .headerInner {
+    min-height: 62px;
+    gap: 0.35rem;
+  }
+
+  .logoLink {
+    width: clamp(9rem, 43vw, 10.625rem);
+  }
+
+  .footer {
+    margin-top: 4rem;
+  }
+
+  .footerInner {
+    gap: 2.2rem 1.5rem;
+    padding-block: 3rem 2rem;
+  }
+
+  .footerBrand {
+    grid-column: 1 / -1;
+  }
+
+  .footerBottom {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 29.99rem) {
+  .logoLink {
+    width: min(42vw, 9.375rem);
+  }
+
+  .footerInner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .footerBrand {
+    grid-column: auto;
+  }
+}
+
+/* The sheet copy of the switch only exists below the mobile breakpoint. */
+@media (min-width: 64rem) {
+  .mobileLocale {
+    display: none;
+  }
+}

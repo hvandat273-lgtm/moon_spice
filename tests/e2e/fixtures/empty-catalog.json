@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "revision": 0,
+  "updatedAt": "1970-01-01T00:00:00.000Z",
+  "categories": [],
+  "products": [],
+  "productImages": [],
+  "productVariants": [],
+  "usageSuggestions": [],
+  "reviews": [],
+  "settings": {
+    "heroProductId": null,
+    "featuredProductId": null,
+    "homepageBestSellerLimit": 8,
+    "freeShippingThreshold": 500000,
+    "defaultShippingFee": 30000,
+    "pendingOrderExpiryHours": 48,
+    "orderPiiRetentionDays": 730,
+    "orderAssetRetentionDays": 730,
+    "storeContact": {},
+    "announcementText": "MOOR SPICE 公式オンラインカタログ"
+  }
+}

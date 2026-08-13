@@ -1,0 +1,10 @@
+{
+  "version": "19-2025-QD-TTg.v1",
+  "effectiveFrom": "2025-07-01",
+  "publishedAt": "2025-06-30",
+  "sourceUrl": "https://vanban.chinhphu.vn/?pageid=27160&docid=214277",
+  "officialReference": "Quyết định 19/2025/QĐ-TTg",
+  "datasetPackage": "vietnam-address-data@1.0.0",
+  "scope": "34 tỉnh/thành và 3.321 phường/xã/đặc khu",
+  "note": "Dữ liệu runtime được pin trong package-lock.json; đối chiếu lại nguồn chính thức trước mỗi lần nâng phiên bản."
+}

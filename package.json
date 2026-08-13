@@ -1,0 +1,73 @@
+{
+  "name": "moon-spice",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:e2e": "playwright test",
+    "test:e2e:responsive": "playwright test --config=playwright.responsive.config.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:reset:test": "tsx scripts/reset-test-database.ts",
+    "db:mark-environment": "tsx scripts/mark-database-environment.ts",
+    "admin:create": "tsx scripts/create-admin.ts",
+    "admin:set-password": "tsx scripts/set-admin-password.ts",
+    "admin:hash-password": "tsx scripts/hash-admin-password.ts",
+    "catalog:export": "tsx scripts/catalog-transfer.ts export",
+    "catalog:import": "tsx scripts/catalog-transfer.ts import",
+    "catalog:apply-pasta-magic": "tsx scripts/apply-pasta-magic-content.ts",
+    "art:build": "tsx scripts/build-product-art.ts"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "@sentry/nextjs": "^10.69.0",
+    "@vercel/blob": "^2.7.0",
+    "bcryptjs": "^3.0.3",
+    "clsx": "^2.1.1",
+    "drizzle-orm": "^0.45.2",
+    "lucide-react": "^1.31.0",
+    "next": "^16.3.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "server-only": "^0.0.1",
+    "sharp": "^0.35.3",
+    "tailwind-merge": "^3.6.0",
+    "vietnam-address-data": "^1.0.0",
+    "ws": "^8.21.3",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^26.2.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@types/ws": "^8.18.1",
+    "axe-core": "^4.13.0",
+    "drizzle-kit": "^0.31.10",
+    "esbuild": "^0.28.2",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.3.0",
+    "jsdom": "^30.0.1",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.12",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "esbuild": "^0.28.2"
+  }
+}

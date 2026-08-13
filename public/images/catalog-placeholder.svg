@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title description">
+  <title id="title">MOOR SPICE</title>
+  <desc id="description">商品画像を準備中</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8f3e9"/>
+      <stop offset="1" stop-color="#e9e1d1"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="900" fill="url(#background)"/>
+  <rect x="44" y="44" width="1112" height="812" rx="28" fill="none" stroke="#d5c9b5" stroke-width="3"/>
+  <g transform="translate(600 350)" fill="none" stroke="#4b512b" stroke-linecap="round" stroke-linejoin="round">
+    <circle r="116" fill="#f3eee3" stroke="#aab08d" stroke-width="3"/>
+    <path d="M0 72V-55" stroke-width="10"/>
+    <path d="M-2-10C-58-19-79-65-71-105-22-104 11-75 1-20Z" fill="#6d7448" stroke-width="5"/>
+    <path d="M4 27C55 20 80-17 78-58 32-61 2-35 4 17Z" fill="#8e9568" stroke-width="5"/>
+  </g>
+  <text x="600" y="565" fill="#8f201c" font-family="Georgia, 'Times New Roman', serif" font-size="58" letter-spacing="18" text-anchor="middle">MOOR SPICE</text>
+  <line x1="435" y1="610" x2="765" y2="610" stroke="#b9ad98" stroke-width="2"/>
+  <text x="600" y="670" fill="#625d52" font-family="Arial, sans-serif" font-size="25" letter-spacing="7" text-anchor="middle">商品画像を準備中</text>
+</svg>

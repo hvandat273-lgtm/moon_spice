@@ -1,0 +1,695 @@
+/* ---------------------------------------------------------------------------
+ * Motion layer — every moving thing on the storefront is defined here so the
+ * section stylesheets only have to opt in with a data attribute.
+ *
+ * Two rules shape this file:
+ *
+ * 1. Nothing loops. Decorative infinite animations are a known distraction
+ *    (and burn CPU on an idle tab), so every effect below is driven by a
+ *    scroll timeline or a pointer. Stop scrolling and the page is still.
+ *    The one exception in the codebase is the loading skeleton's shimmer,
+ *    which is a progress indicator rather than decoration.
+ *
+ * 2. Motion is additive. Every scroll-driven rule sits inside an
+ *    `@supports (animation-timeline: view())` block and no element is given a
+ *    hidden resting state outside it. A browser without scroll-driven
+ *    animations renders the finished page, not a blank one.
+ * ------------------------------------------------------------------------ */
+
+/* Registered so they interpolate on the compositor instead of snapping. */
+@property --fill {
+  syntax: "<number>";
+  inherits: false;
+  /* 1 so an unsupported browser shows a full meter rather than an empty one. */
+  initial-value: 1;
+}
+
+@property --tilt-x {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+
+@property --tilt-y {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+
+:root {
+  /* Lets <details> and grid rows transition to and from `auto`. */
+  interpolate-size: allow-keywords;
+}
+
+/* ---------------------------------------------------------------------------
+ * Reveals. `data-reveal` on any element; `--i` staggers a group by shifting
+ * the scroll range rather than the delay, because a scroll timeline ignores
+ * `animation-delay` entirely.
+ * ------------------------------------------------------------------------ */
+
+@supports (animation-timeline: view()) {
+  [data-reveal] {
+    animation: reveal-rise linear both;
+    animation-timeline: view();
+    /* 3% per item, not 5%: in a full-viewport chapter the later items in a row
+     * were still mid-reveal by the time the reader had scrolled past them. */
+    animation-range-start: entry calc(4% + var(--i, 0) * 3%);
+    animation-range-end: cover calc(22% + var(--i, 0) * 3%);
+  }
+
+  [data-reveal="fade"] {
+    animation-name: reveal-fade;
+  }
+
+  [data-reveal="scale"] {
+    animation-name: reveal-scale;
+  }
+
+  [data-reveal="tilt"] {
+    animation-name: reveal-tilt;
+  }
+
+  [data-reveal="clip"] {
+    animation-name: reveal-clip;
+  }
+}
+
+@keyframes reveal-rise {
+  from {
+    opacity: 0;
+    translate: 0 2.25rem;
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    filter: blur(0);
+  }
+}
+
+@keyframes reveal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes reveal-scale {
+  from {
+    opacity: 0;
+    scale: 0.94;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+/* Cards lift out of the page rather than sliding up it.
+ *
+ * This deliberately uses the individual `rotate`/`translate` properties rather
+ * than a `transform` shorthand. Card hover states own `transform`, and a
+ * filling animation on the same property would win over them permanently once
+ * the reveal settled — the cards would render but never respond to hover.
+ * The individual properties compose with `transform` instead of replacing it.
+ *
+ * Depth comes from the container's perspective; see `.reveal-stage`. */
+@keyframes reveal-tilt {
+  from {
+    opacity: 0;
+    rotate: x 9deg;
+    translate: 0 2rem;
+  }
+  to {
+    opacity: 1;
+    rotate: x 0deg;
+    translate: 0 0;
+  }
+}
+
+/* Applied to whatever lays out a group of `data-reveal="tilt"` cards. Without
+ * a perspective on the parent, `rotate: x` flattens into a vertical squash. */
+.reveal-stage {
+  perspective: 1200px;
+}
+
+/* Headlines wipe in from the baseline up. */
+@keyframes reveal-clip {
+  from {
+    clip-path: inset(0 0 100% 0);
+    translate: 0 0.75rem;
+  }
+  to {
+    clip-path: inset(0 0 -10% 0);
+    translate: 0 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Parallax. `--parallax` is the travel distance in percent of the element's
+ * own height; the layer moves from -v to +v across the time it is on screen.
+ * ------------------------------------------------------------------------ */
+
+@supports (animation-timeline: view()) {
+  [data-parallax] {
+    animation: parallax-drift linear both;
+    animation-timeline: view();
+    animation-range: cover;
+    will-change: translate;
+  }
+}
+
+@keyframes parallax-drift {
+  from {
+    translate: 0 calc(var(--parallax, 6%) * -1);
+  }
+  to {
+    translate: 0 var(--parallax, 6%);
+  }
+}
+
+/* A slow push-in on a still photograph — the "video" moment, without a video. */
+@supports (animation-timeline: view()) {
+  [data-kenburns] {
+    animation: kenburns-push linear both;
+    animation-timeline: view();
+    animation-range: cover;
+    will-change: transform;
+  }
+}
+
+@keyframes kenburns-push {
+  from {
+    transform: scale(1.02) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.14) translate3d(0, -1.5%, 0);
+  }
+}
+
+/* Colour arriving as the reader arrives. */
+@supports (animation-timeline: view()) {
+  [data-desaturate] {
+    animation: desaturate-in linear both;
+    animation-timeline: view();
+    animation-range: entry 18% cover 46%;
+  }
+}
+
+@keyframes desaturate-in {
+  from {
+    filter: grayscale(0.85) contrast(1.04);
+  }
+  to {
+    filter: grayscale(0) contrast(1);
+  }
+}
+
+/* A rule or timeline spine that draws itself downward. */
+@supports (animation-timeline: view()) {
+  [data-draw] {
+    animation: draw-down linear both;
+    animation-timeline: view();
+    animation-range: entry 10% cover 60%;
+    transform-origin: top center;
+  }
+}
+
+@keyframes draw-down {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* Meters. Resting scale is 1 so the inline width fallback stays truthful. */
+[data-meter] {
+  transform: scaleX(var(--fill));
+  transform-origin: left center;
+}
+
+@supports (animation-timeline: view()) {
+  [data-meter] {
+    animation: meter-fill linear both;
+    animation-timeline: view();
+    animation-range: entry 25% cover 55%;
+  }
+}
+
+@keyframes meter-fill {
+  from {
+    --fill: 0;
+  }
+  to {
+    --fill: 1;
+  }
+}
+
+/* Vertical fill — a column that rises to a level as the reader arrives.
+ * `--fill-target` is the level (0-1) set per column in the markup; `--fill`
+ * animates 0 -> 1 and scales it, so a column at 40% never overshoots. */
+[data-fill-y] {
+  transform: scaleY(calc(var(--fill) * var(--fill-target, 1)));
+  transform-origin: bottom center;
+}
+
+@supports (animation-timeline: view()) {
+  [data-fill-y] {
+    animation: meter-fill linear both;
+    animation-timeline: view();
+    animation-range: entry 20% cover 62%;
+  }
+}
+
+/* Rotation tied to scroll position — a seal or an orbit that answers the
+ * reader's movement instead of spinning on its own forever. */
+@supports (animation-timeline: view()) {
+  [data-spin] {
+    animation: spin-through linear both;
+    animation-timeline: view();
+    animation-range: cover;
+  }
+}
+
+@keyframes spin-through {
+  from {
+    rotate: calc(var(--spin, 40deg) * -1);
+  }
+  to {
+    rotate: var(--spin, 40deg);
+  }
+}
+
+/* A row of cards unfurling from a stack. --fan-offset is the card's distance
+ * from the centre of the row, so the deck converges inward at rest and opens
+ * outward to its final grid position. Converging (rather than fanning past
+ * the edges) is deliberate: every intermediate frame stays inside the row's
+ * own bounds, so the page can never scroll sideways mid-animation. */
+@supports (animation-timeline: view()) {
+  [data-fan] {
+    animation: fan-open linear both;
+    animation-timeline: view();
+    animation-range: entry 6% cover 40%;
+  }
+}
+
+@keyframes fan-open {
+  from {
+    opacity: 0;
+    transform:
+      perspective(1400px)
+      translateX(calc(var(--fan-offset, 0) * -26%))
+      rotateY(calc(var(--fan-offset, 0) * -13deg))
+      scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1400px) translateX(0) rotateY(0deg) scale(1);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Scene transitions between chapters.
+ *
+ * Each chapter recedes slightly as it leaves and advances as it arrives, so
+ * the six full-viewport scenes read as a stack with depth rather than as a
+ * list. Two animations on one element, each with its own timeline and range:
+ * `entry` drives the arrival, `exit` the departure.
+ *
+ * Deliberately shallow. The ranges stop well short of the full entry/exit
+ * span so a chapter is at full opacity for the whole time it is actually
+ * being read — a scene that keeps fading while you read it is a bug, not an
+ * effect.
+ * ------------------------------------------------------------------------ */
+
+@supports (animation-timeline: view()) {
+  [data-scene] {
+    animation: scene-arrive linear both, scene-depart linear both;
+    animation-timeline: view(), view();
+    animation-range: entry 0% entry 55%, exit 45% exit 100%;
+  }
+}
+
+@keyframes scene-arrive {
+  from {
+    opacity: 0.25;
+    scale: 0.965;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes scene-depart {
+  from {
+    opacity: 1;
+    scale: 1;
+  }
+  to {
+    opacity: 0.3;
+    scale: 0.975;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Line-by-line text reveal.
+ *
+ * A soft mask edge travelling down the block. True per-line animation would
+ * need JS to measure where the lines fall, and would have to re-measure on
+ * every resize and on every language switch — English and Japanese wrap at
+ * completely different points. A moving mask reads the same and survives both.
+ * ------------------------------------------------------------------------ */
+
+@property --reveal-stop {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 200%;
+}
+
+[data-lines] {
+  mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 var(--reveal-stop),
+    transparent calc(var(--reveal-stop) + 14%)
+  );
+}
+
+@supports (animation-timeline: view()) {
+  [data-lines] {
+    animation: lines-in linear both;
+    animation-timeline: view();
+    animation-range: entry 10% cover 45%;
+  }
+}
+
+@keyframes lines-in {
+  from {
+    --reveal-stop: -10%;
+  }
+  to {
+    --reveal-stop: 120%;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Magnetic pointer. `Magnetic` writes --pull-x/--pull-y; the element leans
+ * toward the cursor as it approaches and springs back on leave.
+ * ------------------------------------------------------------------------ */
+
+@property --pull-x {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --pull-y {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+.magnetic {
+  display: inline-flex;
+  translate: var(--pull-x) var(--pull-y);
+  transition: translate var(--dur-slow, 300ms) var(--ease-out-expo, ease-out);
+}
+
+.magnetic[data-pulling="true"] {
+  /* Follow the cursor directly; the transition is only for the spring back. */
+  transition: none;
+}
+
+/* Marquee. Track holds two identical copies; -50% lands exactly on the seam. */
+@supports (animation-timeline: view()) {
+  [data-marquee] {
+    animation: marquee-drift linear both;
+    animation-timeline: view();
+    animation-range: cover;
+    will-change: translate;
+  }
+}
+
+@keyframes marquee-drift {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: -50% 0;
+  }
+}
+
+/* Page reading progress and the header condensing as you leave the hero. */
+@supports (animation-timeline: scroll()) {
+  [data-scroll-progress] {
+    animation: progress-grow linear both;
+    animation-timeline: scroll(root block);
+    transform-origin: left center;
+  }
+
+  [data-header-condense] {
+    animation: header-condense linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 180px;
+  }
+}
+
+/* Affordances that should retire once the reader has started moving. */
+@supports (animation-timeline: scroll()) {
+  [data-scroll-fade] {
+    animation: scroll-fade linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 220px;
+  }
+}
+
+@keyframes scroll-fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes progress-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes header-condense {
+  from {
+    /* Not lower than this: the bar is dark over a cream page, and a thinner
+       veil lets the paper through until the whole masthead reads grey. */
+    --header-pad: 17px;
+    --header-veil: 88%;
+    --header-shade: 0;
+  }
+  to {
+    --header-pad: 5px;
+    --header-veil: 96%;
+    --header-shade: 1;
+  }
+}
+
+/* @property initial values have to be computationally independent, so these
+ * are px and unitless rather than rem. */
+@property --header-pad {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 17px;
+}
+
+@property --header-veil {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 92%;
+}
+
+@property --header-shade {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+/* ---------------------------------------------------------------------------
+ * 3D. `.depthScene` establishes the perspective; children translate on Z and
+ * are scaled back so they keep their intended on-screen size. `overflow: clip`
+ * is not optional — a layer pushed toward the viewer widens past the viewport
+ * and the responsive overflow test catches it immediately.
+ * ------------------------------------------------------------------------ */
+
+.depth-scene {
+  position: relative;
+  overflow: clip;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+.depth-layer {
+  transform: translateZ(var(--z, 0px)) scale(calc(1 - (var(--z, 0px) / 1200px)));
+}
+
+/* Pointer tilt. TiltCard writes --tilt-x/--tilt-y; the resting state is flat,
+ * so the markup is unchanged for touch users and for anyone without JS. */
+.tilt {
+  transform: perspective(1000px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transition: transform var(--dur-slow, 300ms) var(--ease-out-expo, ease-out);
+}
+
+.tilt[data-tilting="true"] {
+  /* Track the pointer directly while it is over the card; the transition is
+   * only there to ease the card back to flat once the pointer leaves. */
+  transition: none;
+}
+
+/* ---------------------------------------------------------------------------
+ * View transitions. Header stays put so the reader keeps a fixed anchor, and
+ * the overlay never swallows a click mid-flight.
+ * ------------------------------------------------------------------------ */
+
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-group(site-header) {
+  z-index: 100;
+  animation: none;
+}
+
+::view-transition-old(site-header) {
+  display: none;
+}
+
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+/* The default crossfade React applies to the page wrapper. Short, and
+ * asymmetric: the outgoing frame leaves quickly so it does not compete with
+ * the incoming one for attention. */
+::view-transition-old(root) {
+  animation: 140ms ease-in both page-fade reverse;
+}
+
+::view-transition-new(root) {
+  animation: 220ms ease-out 90ms both page-fade;
+}
+
+@keyframes page-fade {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+::view-transition-group(.morph) {
+  animation-duration: 400ms;
+}
+
+::view-transition-image-pair(.morph) {
+  animation-name: via-blur;
+}
+
+@keyframes via-blur {
+  30% {
+    filter: blur(3px);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Reduced motion. Reveals are allowed to resolve instantly to their finished
+ * state (the global 0.01ms duration rule in globals.css does that), but every
+ * purely decorative movement is switched off outright — leaving a parallax
+ * layer parked at its end position would be worse than never moving it.
+ * ------------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  /* `animation: none`, not `animation-timeline: none`. Dropping only the
+   * timeline leaves the animation with an unresolved current time, and with
+   * `fill: both` the browser then paints the *before* phase — every revealed
+   * element would sit at `opacity: 0` forever. Removing the animation
+   * outright falls back to the element's own styles, which are the finished
+   * state by construction. */
+  [data-reveal],
+  [data-hero-char],
+  [data-header-condense],
+  [data-scroll-fade],
+  [data-parallax],
+  [data-fan],
+  [data-kenburns],
+  [data-desaturate],
+  [data-draw],
+  [data-spin],
+  [data-scene],
+  [data-lines],
+  [data-marquee] {
+    animation: none !important;
+  }
+
+  /* The mask has to be cleared as well as the animation: leaving the initial
+   * --reveal-stop in place would clip the text permanently. */
+  [data-lines] {
+    mask-image: none !important;
+  }
+
+  [data-scene] {
+    opacity: 1 !important;
+    scale: none !important;
+  }
+
+  .magnetic {
+    translate: none !important;
+    transition: none !important;
+  }
+
+  /* --fill is registered with an initial value of 1, so with no animation the
+   * meter renders at the width its inline style already declares, and a
+   * column renders at its own --fill-target. */
+  [data-meter],
+  [data-fill-y] {
+    animation: none !important;
+  }
+
+  /* No timeline means no way to report progress without JS; an empty bar
+   * would just be a permanently misleading affordance. */
+  [data-scroll-progress] {
+    display: none !important;
+  }
+
+  [data-parallax],
+  [data-kenburns],
+  [data-desaturate],
+  [data-draw],
+  [data-spin],
+  [data-marquee] {
+    translate: none !important;
+    rotate: none !important;
+    filter: none !important;
+  }
+
+  .tilt {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}

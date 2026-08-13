@@ -1,0 +1,27 @@
+{
+  "_comment": "English overrides for catalogue data, keyed by product slug. The catalogue itself is admin-editable and stores one language; rather than add locale fields to the domain model and the admin form, the `en` locale looks its copy up here and falls back to whatever the catalogue holds. A product with no entry simply shows its Japanese text.",
+
+  "products": {
+    "pasta-magic-powder": {
+      "name": "Pasta Magic Powder",
+      "categoryName": "Pasta seasoning",
+      "shortDescription": "Water, salt, pasta — and one spoonful. From the home kitchen to the Italian one.",
+      "description": "A pasta seasoning blended for aglio e olio. Dried garlic, chilli, parsley and basil come together with pasta water and olive oil for an easy, aromatic finish.",
+      "ingredients": "Garlic flakes, minced garlic, chilli, parsley, basil, salt and chicken consommé",
+      "usage": "For one serving, use 5g of Pasta Magic Powder with 100g of pasta. Combine with 3 tablespoons of pasta water, then finish with 15g of extra virgin olive oil.",
+      "storageInstructions": "Seal the pouch tightly after use and store away from direct sunlight, heat and humidity. Refer to the package for the best-before date.",
+      "origin": "Please refer to the product packaging.",
+      "manufacturer": "Operation Factory",
+      "distributor": "Operation Factory",
+      "shelfLife": "Please refer to the product packaging.",
+      "allergenWarning": "Contains chicken consommé. Please refer to the product packaging for allergen information.",
+      "nutritionInfo": "Please refer to the product packaging.",
+      "usageSuggestions": {
+        "アーリオ・オーリオに": "For aglio e olio",
+        "ゆで汁と合わせて": "Loosened with pasta water",
+        "オリーブオイルで仕上げ": "Finished with olive oil",
+        "ひとさじで香り豊かに": "One spoonful, full of aroma"
+      }
+    }
+  }
+}

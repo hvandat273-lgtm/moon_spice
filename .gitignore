@@ -1,0 +1,14 @@
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+tmp/
+shot-tmp.mjs
+.data/
+.env*
+!.env.example
+*.log
+.vercel/
+*.tsbuildinfo
