@@ -22,7 +22,9 @@ const nextConfig: NextConfig = {
   // previous build open while a new one is promoted, Next can detect the
   // mismatch and hard-navigate instead of mixing old RSC/JS with the new
   // server (which otherwise falls through to app/error.tsx).
-  deploymentId: process.env.VERCEL_GIT_COMMIT_SHA || undefined,
+  // Vercel accepts custom deployment IDs up to 32 characters; Git SHAs are
+  // 40, so keep a collision-resistant prefix that still satisfies the limit.
+  deploymentId: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 32) || undefined,
   allowedDevOrigins: ["127.0.0.1"],
   env: {
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN ?? process.env.SENTRY_DSN ?? "",
