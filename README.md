@@ -55,6 +55,20 @@ Thiết lập các biến Secret trên Render:
 
 Không cần PostgreSQL, SQLite, Docker, `DATABASE_URL`, hay biến thanh toán/đơn hàng.
 
+## Vercel
+
+Nếu chưa cấu hình persistent backend, storefront trên Vercel tự dùng
+`data/showcase-catalog.json` ở chế độ chỉ đọc để website vẫn hiển thị bình
+thường. Admin chỉnh sửa catalog được khóa trong chế độ này.
+
+Để lưu thay đổi từ Admin trên Vercel, cấu hình:
+
+- `CATALOG_BACKEND=vercel-blob`
+- `CATALOG_BLOB_READ_WRITE_TOKEN` cho kho JSON private
+- `STORAGE_ADAPTER=vercel-blob`
+- `BLOB_READ_WRITE_TOKEN` cho kho ảnh public
+- `NEXT_PUBLIC_SITE_URL` bằng URL HTTPS production
+
 ## Dữ liệu và ảnh
 
 - `CATALOG_BACKEND=local-json` dùng JSON file, phù hợp local và Render có disk.

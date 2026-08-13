@@ -6,7 +6,7 @@ import { BlobPreconditionFailedError, get, put } from "@vercel/blob";
 import { z } from "zod";
 import { cache } from "react";
 
-export type CatalogBackend = "local-json" | "vercel-blob" | "postgres";
+export type CatalogBackend = "bundled-json" | "local-json" | "vercel-blob" | "postgres";
 
 const CATALOG_BLOB_PATHNAME = "moon-spice/catalog/v1/catalog.json";
 const LOCAL_CATALOG_PATH = path.join(process.cwd(), ".data", "catalog.json");
@@ -301,13 +301,19 @@ export function getCatalogBackend(): CatalogBackend {
   const configured = process.env.CATALOG_BACKEND?.trim();
   if (configured) {
     const backend = z.enum(["local-json", "vercel-blob", "postgres"]).parse(configured);
-    if (backend === "local-json" && process.env.VERCEL) {
-      throw new Error("CATALOG_BACKEND=local-json is not persistent on Vercel; use vercel-blob");
-    }
+    // A local-json value often arrives on a first Vercel deploy by copying the
+    // development env file. Treat it as the same safe read-only showcase
+    // fallback instead of crashing every public request.
+    if (backend === "local-json" && process.env.VERCEL) return "bundled-json";
     return backend;
   }
   if (process.env.DATABASE_URL?.trim()) return "postgres";
-  if (process.env.VERCEL || process.env.DEPLOYMENT_MODE === "production") {
+  // A fresh Vercel project has no persistent catalog configured yet. Keep the
+  // public storefront available from the versioned showcase document while
+  // the admin remains fail-closed through lib/server/env.ts. This backend is
+  // intentionally read-only; configuring Blob or Postgres takes precedence.
+  if (process.env.VERCEL) return "bundled-json";
+  if (process.env.DEPLOYMENT_MODE === "production") {
     throw new Error("CATALOG_BACKEND must be explicitly configured on Vercel/production");
   }
   return "local-json";
@@ -340,6 +346,10 @@ async function readLocalDocument(): Promise<CatalogDocument> {
   }
 }
 
+async function readBundledDocument(): Promise<CatalogDocument> {
+  return parseCatalogDocument(JSON.parse(await readFile(BUNDLED_SHOWCASE_PATH, "utf8")));
+}
+
 async function readBlobDocument(): Promise<{ document: CatalogDocument; etag: string | null }> {
   const result = await get(CATALOG_BLOB_PATHNAME, { access: "private", useCache: false, token: requireCatalogBlobToken() });
   if (!result) return { document: emptyCatalogDocument(), etag: null };
@@ -350,6 +360,7 @@ async function readBlobDocument(): Promise<{ document: CatalogDocument; etag: st
 
 async function readCatalogDocumentUncached(): Promise<CatalogDocument> {
   const backend = getCatalogBackend();
+  if (backend === "bundled-json") return readBundledDocument();
   if (backend === "local-json") return readLocalDocument();
   if (backend === "vercel-blob") return (await readBlobDocument()).document;
   throw new Error("Catalog document store is not used when CATALOG_BACKEND=postgres");
@@ -415,6 +426,7 @@ async function mutateBlobDocument<T>(mutation: (draft: CatalogDocument) => T | P
 
 export async function mutateCatalogDocument<T>(mutation: (draft: CatalogDocument) => T | Promise<T>): Promise<{ document: CatalogDocument; result: T }> {
   const backend = getCatalogBackend();
+  if (backend === "bundled-json") throw new Error("The bundled catalog is read-only; configure vercel-blob or postgres before editing");
   if (backend === "vercel-blob") return mutateBlobDocument(mutation);
   if (backend === "postgres") throw new Error("Catalog document mutations are not used when CATALOG_BACKEND=postgres");
   return withLocalMutationLock(async () => {
