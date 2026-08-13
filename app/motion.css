@@ -397,32 +397,9 @@
   }
 }
 
-/* ---------------------------------------------------------------------------
- * Magnetic pointer. `Magnetic` writes --pull-x/--pull-y; the element leans
- * toward the cursor as it approaches and springs back on leave.
- * ------------------------------------------------------------------------ */
-
-@property --pull-x {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-
-@property --pull-y {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-
 .magnetic {
   display: inline-flex;
-  translate: var(--pull-x) var(--pull-y);
-  transition: translate var(--dur-slow, 300ms) var(--ease-out-expo, ease-out);
-}
-
-.magnetic[data-pulling="true"] {
-  /* Follow the cursor directly; the transition is only for the spring back. */
-  transition: none;
+  translate: none;
 }
 
 /* Marquee. Track holds two identical copies; -50% lands exactly on the seam. */

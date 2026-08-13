@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import { ArrowRight, Sparkles } from "lucide-react";
 
 import type { Product } from "@/types/domain";
@@ -10,7 +10,6 @@ import { useLocalizedProduct } from "@/lib/i18n/useLocalizedProduct";
 
 import { Magnetic } from "./Magnetic";
 import { imageForRole, primaryImage } from "./product-utils";
-import { usePointerVars } from "./usePointerVars";
 import hero from "./hero.module.css";
 
 const WORDMARK = "MOOR SPICE";
@@ -33,33 +32,6 @@ const WORDMARK_WORDS = WORDMARK.split(" ").map((word, wordIndex, words) => ({
 export function HeroProduct({ product: source }: { product: Product }) {
   const t = useT();
   const product = useLocalizedProduct(source);
-  const heroRef = useRef<HTMLElement>(null);
-
-  usePointerVars(
-    heroRef,
-    ({ x, y, rect }) => {
-      const horizontal = (x - rect.left) / rect.width - 0.5;
-      const vertical = (y - rect.top) / rect.height - 0.5;
-
-      return {
-        "--hero-shift-x": `${(-horizontal * 18).toFixed(2)}px`,
-        "--hero-shift-y": `${(-vertical * 12).toFixed(2)}px`,
-        "--hero-bloom-x": `${(horizontal * 26).toFixed(2)}px`,
-        "--hero-bloom-y": `${(vertical * 18).toFixed(2)}px`,
-        "--hero-seal-x": `${(horizontal * 8).toFixed(2)}px`,
-        "--hero-seal-y": `${(vertical * 6).toFixed(2)}px`,
-      };
-    },
-    {
-      "--hero-shift-x": "0px",
-      "--hero-shift-y": "0px",
-      "--hero-bloom-x": "0px",
-      "--hero-bloom-y": "0px",
-      "--hero-seal-x": "0px",
-      "--hero-seal-y": "0px",
-    },
-    { flag: "looking" },
-  );
   // Use the complete hero photograph as one layer. The pouch, tabletop and
   // pasta scene are already composited, so there is no cutout edge to alias.
   const scene = imageForRole(product, "HERO_BACKGROUND")
@@ -68,14 +40,13 @@ export function HeroProduct({ product: source }: { product: Product }) {
   const mobileScene = imageForRole(product, "HERO_BACKGROUND_MOBILE") ?? scene;
 
   return (
-    <section aria-labelledby="hero-title" className={hero.hero} id="pasta-magic" ref={heroRef}>
+    <section aria-labelledby="hero-title" className={hero.hero} id="pasta-magic">
       {/* Depth runs back to front: an ambient photograph, the wordmark, then
         * the product standing in front of the letters and occluding them.
         * Occlusion is what sells the depth. The tilt and the contact shadow
         * only sharpen something the stacking order already established. */}
       <div
         className={hero.heroAmbient}
-        data-parallax
         style={{
           "--hero-focal-x": `${scene.focalX ?? 54}%`,
           "--hero-focal-y": `${scene.focalY ?? 50}%`,

@@ -27,8 +27,6 @@
 /* Backdrop, pushed far out of focus so the product reads as the only sharp
  * object on stage. */
 .heroAmbient {
-  --parallax: 2%;
-
   position: absolute;
   z-index: -3;
   inset: 0;
@@ -39,13 +37,7 @@
   position: absolute;
   inset: 0;
   display: block;
-  transform: translate3d(var(--hero-shift-x, 0), var(--hero-shift-y, 0), 0);
-  transition: transform 800ms var(--ease-out-expo);
-  will-change: transform;
-}
-
-.hero[data-looking="true"] .heroAmbientPicture {
-  transition-duration: 140ms;
+  transform: none;
 }
 
 .heroAmbientImage {
@@ -62,17 +54,9 @@
   transform: scale(1.04);
 }
 
-/* The background behaves like a very restrained product-film camera move:
- * a shallow push and lateral drift make the pouch feel separated from the
- * tabletop. It stays subtle enough that the product label never swims behind
- * the copy, and it is deliberately disabled for small screens and reduced
- * motion users. */
+/* Desktop light layers remain static so the full hero never shifts beneath
+ * the pointer or drifts away from its carefully balanced composition. */
 @media (prefers-reduced-motion: no-preference) and (min-width: 48rem) {
-  .heroAmbientImage {
-    animation: hero-camera-drift 14s ease-in-out infinite alternate;
-    will-change: transform;
-  }
-
   .heroCinematicLight {
     position: absolute;
     z-index: 1;
@@ -88,8 +72,7 @@
     );
     mix-blend-mode: screen;
     transform: translate3d(-18%, 0, 0) rotate(-4deg);
-    animation: hero-light-pass 14s ease-in-out infinite alternate;
-    will-change: transform;
+    animation: none;
   }
 
   .heroCinematicBloom {
@@ -98,38 +81,9 @@
     inset: -8%;
     pointer-events: none;
     background: radial-gradient(34% 54% at 49% 37%, rgb(255 233 185 / 0.1), transparent 72%);
-    transform: translate3d(var(--hero-bloom-x, 0), var(--hero-bloom-y, 0), 0);
-    transition: transform 800ms var(--ease-out-expo);
-    animation: hero-bloom-breathe 7s ease-in-out infinite alternate;
-    will-change: transform, opacity;
+    transform: none;
+    animation: none;
   }
-
-  .hero[data-looking="true"] .heroCinematicBloom {
-    transition-duration: 140ms;
-  }
-}
-
-@keyframes hero-camera-drift {
-  from {
-    transform: scale(1.055) translate3d(-0.35%, 0.2%, 0);
-  }
-  to {
-    transform: scale(1.105) translate3d(0.45%, -0.55%, 0);
-  }
-}
-
-@keyframes hero-light-pass {
-  from {
-    transform: translate3d(-18%, 0, 0) rotate(-4deg);
-  }
-  to {
-    transform: translate3d(18%, -1%, 0) rotate(-4deg);
-  }
-}
-
-@keyframes hero-bloom-breathe {
-  from { opacity: 0.4; }
-  to { opacity: 0.9; }
 }
 
 .heroVeil {
@@ -278,12 +232,8 @@
   backdrop-filter: blur(6px);
   color: var(--fg);
   text-align: center;
-  translate: var(--hero-seal-x, 0) var(--hero-seal-y, 0);
-  transition: translate 700ms var(--ease-out-expo), border-color var(--dur-base) var(--ease-out-expo);
-}
-
-.hero[data-looking="true"] .heroSeal {
-  transition-duration: 160ms, var(--dur-base);
+  translate: none;
+  transition: border-color var(--dur-base) var(--ease-out-expo);
 }
 
 .heroSealRing {

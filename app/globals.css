@@ -548,7 +548,6 @@ svg {
   line-height: 1.2;
   text-transform: uppercase;
   transition:
-    transform var(--dur-base) var(--ease-out-expo),
     box-shadow var(--dur-base) var(--ease-out-expo),
     background var(--dur-base) var(--ease-out-expo);
 }
@@ -565,57 +564,16 @@ svg {
   box-shadow: 0 0 34px -12px color-mix(in srgb, var(--accent) 55%, transparent), 0 10px 25px rgb(var(--shadow-rgb) / var(--shadow-a2));
 }
 
-/* A darker face wipes across from the left instead of the whole button
- * changing colour at once. */
-.btn-primary::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  transform: scaleX(0);
-  transform-origin: left center;
+.btn-primary:hover:not(:disabled),
+.btn-primary:focus-visible {
   background: var(--burgundy-dark);
-  transition: transform var(--dur-slow) var(--ease-out-expo);
-}
-
-/* A narrow reflection crosses the CTA on intent. The layer only transforms,
- * so the pill never shifts and the highlight causes no layout work. */
-.btn-primary::after {
-  content: "";
-  position: absolute;
-  z-index: 1;
-  inset: -35% auto -35% -42%;
-  width: 24%;
-  pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 24%), transparent);
-  transform: skewX(-18deg) translateX(0);
-  transition: transform 480ms var(--ease-out-expo);
-}
-
-.btn-primary:hover:not(:disabled)::before,
-.btn-primary:focus-visible::before {
-  transform: scaleX(1);
-}
-
-.btn-primary:hover:not(:disabled)::after,
-.btn-primary:focus-visible::after {
-  transform: skewX(-18deg) translateX(690%);
-}
-
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px);
+  transform: none;
   box-shadow: 0 0 44px -10px color-mix(in srgb, var(--accent) 65%, transparent), 0 16px 34px rgb(var(--shadow-rgb) / var(--shadow-a3));
 }
 
 .btn-primary:disabled {
   cursor: not-allowed;
   opacity: 0.48;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .btn-primary::after {
-    display: none;
-  }
 }
 
 .text-link,
