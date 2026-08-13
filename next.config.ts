@@ -18,6 +18,11 @@ const publicContentSecurityPolicy = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  // Give every Vercel build a stable identity. If a visitor still has the
+  // previous build open while a new one is promoted, Next can detect the
+  // mismatch and hard-navigate instead of mixing old RSC/JS with the new
+  // server (which otherwise falls through to app/error.tsx).
+  deploymentId: process.env.VERCEL_GIT_COMMIT_SHA || undefined,
   allowedDevOrigins: ["127.0.0.1"],
   env: {
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN ?? process.env.SENTRY_DSN ?? "",
