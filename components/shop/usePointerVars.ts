@@ -24,6 +24,7 @@ export function usePointerVars(
 
     // A coarse pointer has no hover position to follow, and pointer-tracked
     // motion is exactly what reduced motion asks us to drop.
+    if (typeof window.matchMedia !== "function") return;
     if (!window.matchMedia("(pointer: fine)").matches) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 

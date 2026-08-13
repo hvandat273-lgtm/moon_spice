@@ -8,7 +8,6 @@ import {
   useEffect,
   useMemo,
   useState,
-  ViewTransition,
   type ReactNode,
 } from "react";
 
@@ -88,13 +87,7 @@ export function LocaleProvider({
   }, [locale, setLocale]);
 
   return (
-    <LocaleContext.Provider value={value}>
-      {/* Covers two cases with one wrapper: the language swap above, and route
-        * navigations — both are Transitions, so both crossfade. Children that
-        * want their own behaviour opt out with `default="none"`, which is what
-        * the recipe image morph does. */}
-      <ViewTransition default="auto">{children}</ViewTransition>
-    </LocaleContext.Provider>
+    <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>
   );
 }
 

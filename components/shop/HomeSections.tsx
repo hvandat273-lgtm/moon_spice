@@ -1,6 +1,5 @@
 "use client";
 
-import { getImageProps } from "next/image";
 import Link from "next/link";
 import { useRef, type CSSProperties } from "react";
 import { ArrowRight, Sparkles } from "lucide-react";
@@ -68,29 +67,6 @@ export function HeroProduct({ product: source }: { product: Product }) {
     ?? primaryImage(product);
   const mobileScene = imageForRole(product, "HERO_BACKGROUND_MOBILE") ?? scene;
 
-  const imageCommon = {
-    alt: "",
-    fetchPriority: "high" as const,
-    quality: 75,
-    sizes: "100vw",
-  };
-  const {
-    props: { srcSet: desktopSrcSet },
-  } = getImageProps({
-    ...imageCommon,
-    height: 1080,
-    src: scene.url,
-    width: 1920,
-  });
-  const {
-    props: { srcSet: mobileSrcSet, ...mobileImageProps },
-  } = getImageProps({
-    ...imageCommon,
-    height: 1200,
-    src: mobileScene.url,
-    width: 900,
-  });
-
   return (
     <section aria-labelledby="hero-title" className={hero.hero} id="pasta-magic" ref={heroRef}>
       {/* Depth runs back to front: an ambient photograph, the wordmark, then
@@ -108,12 +84,19 @@ export function HeroProduct({ product: source }: { product: Product }) {
         } as CSSProperties}
       >
         <picture className={hero.heroAmbientPicture}>
-          {/* Art direction keeps the product in frame on portrait screens. The
-            * browser selects one source, while getImageProps preserves Next's
-            * responsive image optimisation for both variants. */}
-          <source media="(min-width: 48rem)" srcSet={desktopSrcSet} />
-          <source media="(max-width: 47.99rem)" srcSet={mobileSrcSet} />
-          <img {...mobileImageProps} alt="" className={hero.heroAmbientImage} />
+          {/* This critical WebP is served directly so rendering never depends
+            * on a client-side image optimizer calculation or its cache. */}
+          <source media="(min-width: 48rem)" srcSet={scene.url} />
+          <source media="(max-width: 47.99rem)" srcSet={mobileScene.url} />
+          <img
+            alt=""
+            className={hero.heroAmbientImage}
+            decoding="async"
+            fetchPriority="high"
+            height={1200}
+            src={mobileScene.url}
+            width={900}
+          />
         </picture>
         {/* A restrained, CSS-rendered cinematic pass gives the still life a
           * dimensional camera movement without shipping a multi-megabyte
