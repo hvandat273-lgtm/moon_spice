@@ -118,6 +118,28 @@ export async function assertProductionDatabaseIdentity(): Promise<void> {
 }
 
 export function getPublicSiteUrl(): URL {
-  const raw = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  return new URL(raw);
+  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  const vercelHostname = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim()
+    || process.env.VERCEL_URL?.trim();
+  const candidates = [
+    configured,
+    vercelHostname
+      ? (/^https?:\/\//i.test(vercelHostname) ? vercelHostname : `https://${vercelHostname}`)
+      : undefined,
+    "http://localhost:3000",
+  ];
+
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+    try {
+      const url = new URL(candidate);
+      if (url.protocol === "http:" || url.protocol === "https:") return url;
+    } catch {
+      // Public metadata must never take down a page because an optional
+      // environment variable is blank or malformed. Try the platform URL,
+      // then the local development fallback.
+    }
+  }
+
+  return new URL("http://localhost:3000");
 }

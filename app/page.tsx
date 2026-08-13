@@ -15,6 +15,7 @@ import { ChapterRail } from "@/components/shop/ChapterRail";
 import { HeroProduct } from "@/components/shop/HomeSections";
 import { EmptyCatalogNotice } from "@/components/shop/EmptyCatalogNotice";
 import { getHomepageCatalog } from "@/lib/server/catalog";
+import { getPublicSiteUrl } from "@/lib/server/env";
 
 export const dynamic = "force-dynamic";
 
@@ -29,12 +30,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function HomePage() {
   const { heroProduct, featuredProduct } = await getHomepageCatalog();
+  const siteUrl = getPublicSiteUrl();
   const organizationJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "MOOR SPICE",
-    url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
-    logo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/brand/logo.svg`
+    url: siteUrl.toString(),
+    logo: new URL("/brand/logo.svg", siteUrl).toString()
   };
 
   const hasCatalogContent = Boolean(heroProduct || featuredProduct);

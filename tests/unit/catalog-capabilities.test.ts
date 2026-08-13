@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { getCatalogBackend, isCommerceEnabled, isSiteIndexingEnabled } from "@/lib/server/env";
+import { getCatalogBackend, getPublicSiteUrl, isCommerceEnabled, isSiteIndexingEnabled } from "@/lib/server/env";
 
 describe("catalog capabilities", () => {
   afterEach(() => vi.unstubAllEnvs());
@@ -43,5 +43,18 @@ describe("catalog capabilities", () => {
     expect(isSiteIndexingEnabled()).toBe(false);
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://moor-spice.example");
     expect(isSiteIndexingEnabled()).toBe(true);
+  });
+
+  it("falls back to the Vercel hostname when NEXT_PUBLIC_SITE_URL is blank", () => {
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "");
+    vi.stubEnv("VERCEL_PROJECT_PRODUCTION_URL", "moor-spice.vercel.app");
+    expect(getPublicSiteUrl().toString()).toBe("https://moor-spice.vercel.app/");
+  });
+
+  it("does not crash metadata when an optional public URL is malformed", () => {
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "://invalid");
+    vi.stubEnv("VERCEL_PROJECT_PRODUCTION_URL", "");
+    vi.stubEnv("VERCEL_URL", "");
+    expect(getPublicSiteUrl().toString()).toBe("http://localhost:3000/");
   });
 });

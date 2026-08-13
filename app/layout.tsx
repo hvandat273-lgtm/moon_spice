@@ -6,10 +6,8 @@ import { StorefrontFooter, StorefrontHeader } from "@/components/shop/Storefront
 import { DEFAULT_LOCALE, LOCALE_COOKIE, isLocale } from "@/lib/i18n/config";
 import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
 import { getMeta } from "@/lib/i18n/server";
-import { isSiteIndexingEnabled } from "@/lib/server/env";
+import { getPublicSiteUrl, isSiteIndexingEnabled } from "@/lib/server/env";
 import "./globals.css";
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 const notoSans = Noto_Sans_JP({
   subsets: ["latin"],
@@ -30,7 +28,7 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   const m = await getMeta();
   return {
-    metadataBase: new URL(siteUrl),
+    metadataBase: getPublicSiteUrl(),
     title: {
       default: m["meta.siteTitle"],
       template: "%s | MOOR SPICE"

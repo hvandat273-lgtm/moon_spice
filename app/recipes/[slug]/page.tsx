@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { recipeSlugs, recipesByLocale } from "../data";
 import { RecipeDetailView } from "./RecipeDetailView";
+import { getPublicSiteUrl } from "@/lib/server/env";
 
 interface RecipeDetailProps {
   params: Promise<{ slug: string }>;
@@ -30,7 +31,7 @@ export default async function RecipeDetailPage({ params }: RecipeDetailProps) {
   const recipe = recipesByLocale.ja.find((item) => item.slug === slug);
   if (!recipe) notFound();
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const siteUrl = getPublicSiteUrl();
   const recipeJsonLd = {
     "@context": "https://schema.org",
     "@type": "Recipe",
